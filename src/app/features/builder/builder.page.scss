@@ -144,6 +144,155 @@
 }
 .resume-preview[data-template='minimal'] .resume-header { border-bottom: 1px solid #d7dce5; padding-bottom: 0.7rem; }
 .resume-preview[data-template='minimal'] .resume-body section h3 { font-size: 0.8rem; letter-spacing: 0.12em; }
+.reference-fields { display: flex; flex-direction: column; gap: 1rem; }
+.reference-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--border);
+}
+.reference-field-group h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 1rem;
+}
+.reference-field-group fieldset {
+  display: grid;
+  gap: 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.9rem;
+}
+.reference-field-group legend {
+  padding: 0 0.35rem;
+  color: var(--text);
+  font-weight: 700;
+}
+.preview-panel.reference-template-active { overflow: auto; }
+.resume-preview[data-template='structured-professional'] {
+  box-sizing: border-box;
+  width: 210mm;
+  min-height: 297mm;
+  padding: 12mm;
+  margin: 1.2rem auto;
+  border-radius: 0;
+  color: #1f2937;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10pt;
+  line-height: 1.35;
+}
+.resume-preview[data-template='structured-professional'] .structured-resume { width: 100%; }
+.resume-preview[data-template='structured-professional'] .structured-header {
+  border-bottom: 2px solid #343a40;
+  padding-bottom: 0.7rem;
+  margin-bottom: 0.8rem;
+}
+.resume-preview[data-template='structured-professional'] .structured-header h2 {
+  margin: 0;
+  color: #111827;
+  font-size: 21pt;
+  letter-spacing: 0;
+}
+.resume-preview[data-template='structured-professional'] .structured-header > p {
+  margin: 0.1rem 0 0.35rem;
+  font-weight: 700;
+}
+.resume-preview[data-template='structured-professional'] .structured-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 1rem;
+  font-size: 9pt;
+}
+.resume-preview[data-template='structured-professional'] .structured-box {
+  margin: 0.65rem 0;
+  border: 1px solid #6b7280;
+}
+.resume-preview[data-template='structured-professional'] .structured-box h3,
+.resume-preview[data-template='structured-professional'] .structured-section > h3,
+.resume-preview[data-template='structured-professional'] .structured-project > h3 {
+  margin: 0;
+  padding: 0.25rem 0.4rem;
+  background: #d1d5db;
+  color: #111827;
+  font-size: 10pt;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.resume-preview[data-template='structured-professional'] .structured-box p {
+  min-height: 1.2rem;
+  margin: 0;
+  padding: 0.35rem 0.45rem;
+}
+.resume-preview[data-template='structured-professional'] .structured-section { margin-top: 0.65rem; }
+.resume-preview[data-template='structured-professional'] .structured-section > p,
+.resume-preview[data-template='structured-professional'] .structured-project-copy,
+.resume-preview[data-template='structured-professional'] .structured-footer p {
+  margin: 0.35rem 0;
+  font-size: 9pt;
+}
+.resume-preview[data-template='structured-professional'] .structured-years { font-weight: 700; }
+.resume-preview[data-template='structured-professional'] ul {
+  margin: 0.25rem 0;
+  padding-left: 1.15rem;
+}
+.resume-preview[data-template='structured-professional'] li {
+  margin: 0.12rem 0;
+  font-size: 9pt;
+  line-height: 1.35;
+}
+.resume-preview[data-template='structured-professional'] .structured-skill-grid {
+  border: 1px solid #6b7280;
+}
+.resume-preview[data-template='structured-professional'] .structured-skill-row {
+  display: grid;
+  grid-template-columns: 30% 1fr;
+  border-bottom: 1px solid #9ca3af;
+}
+.resume-preview[data-template='structured-professional'] .structured-skill-row:last-child { border-bottom: 0; }
+.resume-preview[data-template='structured-professional'] .structured-skill-row strong,
+.resume-preview[data-template='structured-professional'] .structured-skill-row span {
+  padding: 0.25rem 0.35rem;
+  font-size: 9pt;
+}
+.resume-preview[data-template='structured-professional'] .structured-skill-row strong {
+  border-right: 1px solid #9ca3af;
+}
+.resume-preview[data-template='structured-professional'] .structured-project {
+  margin-top: 0.75rem;
+  border: 1px solid #6b7280;
+  break-inside: avoid;
+}
+.resume-preview[data-template='structured-professional'] .structured-project dl { margin: 0; }
+.resume-preview[data-template='structured-professional'] .structured-project dl > div {
+  display: grid;
+  grid-template-columns: 25% 1fr;
+  border-bottom: 1px solid #cbd5e1;
+}
+.resume-preview[data-template='structured-professional'] .structured-project dt,
+.resume-preview[data-template='structured-professional'] .structured-project dd {
+  margin: 0;
+  padding: 0.2rem 0.35rem;
+  font-size: 9pt;
+}
+.resume-preview[data-template='structured-professional'] .structured-project dt {
+  border-right: 1px solid #cbd5e1;
+  font-weight: 700;
+}
+.resume-preview[data-template='structured-professional'] .structured-project-copy { padding: 0 0.35rem; }
+.resume-preview[data-template='structured-professional'] .structured-footer {
+  margin-top: 0.9rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #6b7280;
+}
+.resume-preview[data-template='structured-professional'] .structured-signoff {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.6rem;
+  font-size: 9pt;
+}
 .actions-row {
   display: flex;
   flex-wrap: wrap;
