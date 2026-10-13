@@ -1,12 +1,12 @@
-import { Component, signal } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { SiteFooterComponent } from './layout/site-footer/site-footer.component';
+import { SiteHeaderComponent } from './layout/site-header/site-header.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, SiteHeaderComponent, SiteFooterComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
-export class App {
-  protected readonly title = signal('resume-maker');
-}
+export class App {}

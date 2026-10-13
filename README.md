@@ -1,59 +1,31 @@
-# ResumeMaker
+﻿# Resume Maker
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.19.
+Resume Maker is a fully frontend-only Angular application for creating polished resumes, previewing them live, and exporting them as PDF or DOCX files in the browser. It is designed for static hosting on Firebase without backend services or persistence.
 
-## Development server
+## Features
 
-To start a local development server, run:
+- Template library with predefined ATS-friendly layouts
+- Responsive resume builder with live preview
+- PDF export via browser-side rendering
+- DOCX export via the docx library
+- Light/dark theme support
+- No backend, no database, and no persisted resume data across refreshes
 
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Local development
 
 ```bash
-ng generate component component-name
+npm install
+npm start
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Then open http://localhost:4200/
+
+## Production build
 
 ```bash
-ng generate --help
+npm run build
 ```
 
-## Building
+## Firebase Hosting
 
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+This project includes a static hosting configuration for Firebase Hosting.
