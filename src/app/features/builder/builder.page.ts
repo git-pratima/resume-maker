@@ -218,7 +218,7 @@ export class BuilderPage {
 
     const html2pdf = (await import('html2pdf.js')).default;
     const options = {
-      margin: 10,
+      margin: 2,
       filename: `${(this.form.get('fullName')?.value || 'resume').trim() || 'resume'}.pdf`,
       image: { type: 'jpeg' as const, quality: 0.98 },
       html2canvas: { scale: 2 },
