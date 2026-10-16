@@ -78,16 +78,10 @@ interface EditableTableRow { id: string; label: string; value: string; }
           @if (isStructuredTemplate()) {
             <div class="reference-fields">
               @if (isTraditionalC()) {
-                <div class="reference-field-group">
-                  <h2>Section titles</h2>
-                  <p class="customization-hint">Rename any heading shown in the Traditional-C resume.</p>
-                  @for (title of editableSectionTitles; track title.key) {
-                    <label>
-                      <span>{{ title.default }}</span>
-                      <input [value]="sectionTitle(title.key, title.default)" (input)="updateSectionTitle(title.key, $any($event.target).value)" />
-                    </label>
-                  }
-                </div>
+                <label>
+                  <span>Objective title</span>
+                  <input [value]="sectionTitle('objective', 'Objective')" (input)="updateSectionTitle('objective', $any($event.target).value)" />
+                </label>
               }
               <label>
                 <span>Career objective</span>
@@ -95,6 +89,12 @@ interface EditableTableRow { id: string; label: string; value: string; }
               </label>
 
               <div class="form-grid two-up">
+                @if (isTraditionalC()) {
+                  <label>
+                    <span>Experience summary title</span>
+                    <input [value]="sectionTitle('experienceSummary', 'Experience Summary')" (input)="updateSectionTitle('experienceSummary', $any($event.target).value)" />
+                  </label>
+                }
                 <label>
                   <span>Total experience</span>
                   <input formControlName="referenceYears" />
@@ -113,6 +113,10 @@ interface EditableTableRow { id: string; label: string; value: string; }
               <div class="reference-field-group">
                 <h2>Technical skills</h2>
                 @if (isTraditionalC()) {
+                  <label>
+                    <span>Technical skills title</span>
+                    <input [value]="sectionTitle('technicalSkills', 'Technical Skills')" (input)="updateSectionTitle('technicalSkills', $any($event.target).value)" />
+                  </label>
                   <p class="customization-hint">Edit, remove, or add rows for the Traditional-C technical-skills table.</p>
                   @for (row of technicalSkillRows(); track row.id) {
                     <div class="editable-table-row">
@@ -144,6 +148,12 @@ interface EditableTableRow { id: string; label: string; value: string; }
 
               <div class="reference-field-group">
                 <h2>Work history</h2>
+                @if (isTraditionalC()) {
+                  <label>
+                    <span>Work experience title</span>
+                    <input [value]="sectionTitle('workExperience', 'Work Experience')" (input)="updateSectionTitle('workExperience', $any($event.target).value)" />
+                  </label>
+                }
                 <label>
                   <span>Work experience (one point per line)</span>
                   <textarea formControlName="referenceWorkHistory"></textarea>
@@ -152,6 +162,12 @@ interface EditableTableRow { id: string; label: string; value: string; }
 
               <div class="reference-field-group">
                 <h2>Professional experience and training</h2>
+                @if (isTraditionalC()) {
+                  <label>
+                    <span>Professional experience title</span>
+                    <input [value]="sectionTitle('professionalExperience', 'Professional Experience:')" (input)="updateSectionTitle('professionalExperience', $any($event.target).value)" />
+                  </label>
+                }
                 <label>
                   <span>Training or experience details</span>
                   <textarea formControlName="referenceTraining"></textarea>
@@ -172,6 +188,10 @@ interface EditableTableRow { id: string; label: string; value: string; }
                   <fieldset [formGroupName]="project.key">
                     <legend>Project {{ index + 1 }}</legend>
                     @if (isTraditionalC()) {
+                      <label>
+                        <span>Project section title</span>
+                        <input [value]="sectionTitle('project', 'Project')" (input)="updateSectionTitle('project', $any($event.target).value)" />
+                      </label>
                       <p class="customization-hint">Customize this project table’s rows, labels, and values.</p>
                       @for (row of editableProjectRows(project.key); track row.id) {
                         <div class="editable-table-row">
@@ -504,14 +524,6 @@ export class BuilderPage {
     { label: 'Tools', control: 'referenceTools' },
     { label: 'Databases', control: 'referenceDatabases' },
     { label: 'Operating systems', control: 'referenceOperatingSystems' }
-  ] as const;
-  protected readonly editableSectionTitles = [
-    { key: 'objective', default: 'Objective' },
-    { key: 'experienceSummary', default: 'Experience Summary' },
-    { key: 'technicalSkills', default: 'Technical Skills' },
-    { key: 'workExperience', default: 'Work Experience' },
-    { key: 'professionalExperience', default: 'Professional Experience:' },
-    { key: 'project', default: 'Project' }
   ] as const;
   private readonly customSectionTitles = signal<Record<string, string>>({});
   protected readonly technicalSkillRows = signal<EditableTableRow[]>([
