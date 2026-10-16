@@ -1,7 +1,7 @@
 ﻿import { Component, computed, ElementRef, inject, viewChild } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Document, HeadingLevel, Packer, Paragraph, TextRun } from 'docx';
+import { Document as DocxDocument, HeadingLevel, Packer, Paragraph, TextRun } from 'docx';
 import { TemplateService } from '../../core/template.service';
 
 interface StructuredProject {
@@ -305,10 +305,10 @@ interface StructuredProject {
                     <p><strong>Technology and tools used during training</strong></p>
                     <ul class="traditional-professional-list">
                       @for (entry of splitItems(form.controls.referenceTrainingTechnologies.value); track $index) {
-                        <li>{{ entry }}</li>
+                        <li><span class="traditional-list-marker" aria-hidden="true">➢</span>{{ entry }}</li>
                       }
                       @for (entry of splitItems(form.controls.referenceTrainingTools.value); track $index) {
-                        <li>{{ entry }}</li>
+                        <li><span class="traditional-list-marker" aria-hidden="true">➢</span>{{ entry }}</li>
                       }
                     </ul>
                   }
@@ -550,12 +550,33 @@ export class BuilderPage {
     const options = {
       margin: this.isStructuredTemplate() ? 0 : 2,
       filename: `${(this.form.get('fullName')?.value || 'resume').trim() || 'resume'}.pdf`,
-      // html2pdf first paints the resume into a canvas. High-resolution PNGs can
-      // exceed some PDF viewers' canvas/image limits and display as coloured
-      // stripes. A high-quality JPEG at print-safe resolution is reliable across
-      // browsers and still keeps the small resume text crisp.
-      image: { type: 'jpeg' as const, quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' },
+      // html2pdf paints the resume into a canvas before writing the PDF.
+      // Three-times resolution keeps the small text sharp without the canvas
+      // limits that can affect PNG exports.
+      image: { type: 'jpeg' as const, quality: 1 },
+      html2canvas: {
+        scale: 3,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        // html2canvas uses a cloned document, where flex baselines differ from
+        // the browser preview. Use a conventional inline-block line box and
+        // extra lower padding so title text never overlaps its lower border.
+        onclone: (document: Document) => {
+          document
+            .querySelectorAll<HTMLElement>(
+              ".resume-preview[data-template='structured-professional'] .traditional-section-title"
+            )
+            .forEach((title) => {
+              title.style.setProperty('display', 'inline-block', 'important');
+              title.style.setProperty('box-sizing', 'border-box', 'important');
+              title.style.setProperty('margin', '0 0 0.12rem', 'important');
+              title.style.setProperty('padding', '0.04rem 0.45rem 0.24rem', 'important');
+              title.style.setProperty('font-size', '10pt', 'important');
+              title.style.setProperty('line-height', '1', 'important');
+            });
+        }
+      },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const, compress: false },
       pagebreak: { mode: ['css', 'legacy'] }
     };
@@ -589,7 +610,7 @@ export class BuilderPage {
           new Paragraph({ text: this.form.get('skills')?.value || '' })
         ];
 
-    const doc = new Document({
+    const doc = new DocxDocument({
       sections: [
         {
           children
