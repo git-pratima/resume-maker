@@ -77,7 +77,12 @@
 }
 .resume-preview {
   background: white;
-  color: #122033;
+  color: #111111;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10pt;
+  font-weight: 400;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
   min-height: 820px;
   padding: 2rem;
   margin: 1.2rem;
@@ -109,7 +114,7 @@
   flex-direction: column;
   gap: 0.3rem;
   font-size: 0.72rem;
-  color: #475569;
+  color: #111111;
   text-align: right;
 }
 .resume-body { display: grid; gap: 1rem; }
@@ -124,7 +129,7 @@
 }
 .resume-body section p {
   margin: 0 0 0.3rem;
-  color: #334155;
+  color: #111111;
   line-height: 1.6;
   font-size: 0.86rem;
 }
@@ -177,7 +182,7 @@
   padding: 12mm;
   margin: 1.2rem auto;
   border-radius: 0;
-  color: #1f2937;
+  color: #111111;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 10pt;
   line-height: 1.35;

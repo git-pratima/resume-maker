@@ -530,9 +530,12 @@ export class BuilderPage {
     const options = {
       margin: this.isStructuredTemplate() ? 0 : 2,
       filename: `${(this.form.get('fullName')?.value || 'resume').trim() || 'resume'}.pdf`,
-      image: { type: 'jpeg' as const, quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
+      // html2pdf rasterises the preview before placing it in the PDF.  Render at
+      // print resolution and keep the image lossless so small resume text stays
+      // sharp when the PDF is viewed or printed.
+      image: { type: 'png' as const, quality: 1 },
+      html2canvas: { scale: 5, useCORS: true, logging: false },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const, compress: true }
     };
 
     await html2pdf().set(options).from(element.nativeElement).save();
