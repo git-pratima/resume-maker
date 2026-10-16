@@ -357,22 +357,38 @@ interface StructuredProject {
                       @if (project.description) {
                         <p class="structured-project-copy"><strong>Description:</strong> {{ project.description }}</p>
                       }
+                      @if (projectIndex === structuredProjects.length - 1) {
+                        <footer class="structured-footer">
+                          @if (form.controls.referenceGithub.value) {
+                            <p><strong>GitHub:</strong> {{ form.controls.referenceGithub.value }}</p>
+                          }
+                          @if (form.controls.referenceDeclaration.value) {
+                            <p><strong>Declaration:</strong> {{ form.controls.referenceDeclaration.value }}</p>
+                          }
+                          <div class="structured-signoff">
+                            @if (form.controls.referencePlace.value) { <span>Place: {{ form.controls.referencePlace.value }}</span> }
+                            @if (form.controls.referenceSignature.value) { <span>Signature: {{ form.controls.referenceSignature.value }}</span> }
+                          </div>
+                        </footer>
+                      }
                     </section>
                   }
                 }
 
-                <footer class="structured-footer">
-                  @if (form.controls.referenceGithub.value) {
-                    <p><strong>GitHub:</strong> {{ form.controls.referenceGithub.value }}</p>
-                  }
-                  @if (form.controls.referenceDeclaration.value) {
-                    <p><strong>Declaration:</strong> {{ form.controls.referenceDeclaration.value }}</p>
-                  }
-                  <div class="structured-signoff">
-                    @if (form.controls.referencePlace.value) { <span>Place: {{ form.controls.referencePlace.value }}</span> }
-                    @if (form.controls.referenceSignature.value) { <span>Signature: {{ form.controls.referenceSignature.value }}</span> }
-                  </div>
-                </footer>
+                @if (structuredProjects.length === 0) {
+                  <footer class="structured-footer">
+                    @if (form.controls.referenceGithub.value) {
+                      <p><strong>GitHub:</strong> {{ form.controls.referenceGithub.value }}</p>
+                    }
+                    @if (form.controls.referenceDeclaration.value) {
+                      <p><strong>Declaration:</strong> {{ form.controls.referenceDeclaration.value }}</p>
+                    }
+                    <div class="structured-signoff">
+                      @if (form.controls.referencePlace.value) { <span>Place: {{ form.controls.referencePlace.value }}</span> }
+                      @if (form.controls.referenceSignature.value) { <span>Signature: {{ form.controls.referenceSignature.value }}</span> }
+                    </div>
+                  </footer>
+                }
               </article>
             } @else {
               <header class="resume-header">
@@ -480,9 +496,9 @@ export class BuilderPage {
     referenceTrainingTechnologies: ['Angular, TypeScript, Node.js, REST APIs'],
     referenceTrainingTools: ['Git, VS Code, Postman'],
     referenceGithub: [''],
-    referenceDeclaration: [''],
-    referencePlace: [''],
-    referenceSignature: [''],
+    referenceDeclaration: ['I, Piyush Kumar hereby declare that all of the above statements are correct and true to the best of my knowledge.'],
+    referencePlace: ['Bengaluru'],
+    referenceSignature: ['Piyush Kumar'],
     projectOne: this.createProjectGroup(true),
     projectTwo: this.createProjectGroup(),
     projectThree: this.createProjectGroup()
@@ -598,9 +614,10 @@ export class BuilderPage {
         // the browser preview. Use a conventional inline-block line box and
         // extra lower padding so title text never overlaps its lower border.
         onclone: (document: Document) => {
-          document
-            .querySelector<HTMLElement>(".resume-preview[data-template='structured-professional']")
-            ?.classList.add('pdf-export');
+          const resume = document.querySelector<HTMLElement>(
+            ".resume-preview[data-template='structured-professional']"
+          );
+          resume?.classList.add('pdf-export');
           document
             .querySelectorAll<HTMLElement>(
               ".resume-preview[data-template='structured-professional'] .structured-project-page-start"
@@ -626,6 +643,7 @@ export class BuilderPage {
               title.style.setProperty('font-size', '10pt', 'important');
               title.style.setProperty('line-height', '1', 'important');
             });
+
         }
       },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const, compress: false },
