@@ -226,11 +226,6 @@ interface StructuredProject {
             </label>
           }
 
-          <div class="actions-row">
-            <button type="button" class="button button-secondary" (click)="resetForm()">Reset</button>
-            <button type="button" class="button" (click)="downloadPdf()">Download PDF</button>
-            <button type="button" class="button" (click)="downloadDocx()">Download DOCX</button>
-          </div>
         </form>
 
         <div class="preview-panel" [class.reference-template-active]="isStructuredTemplate()">
@@ -267,7 +262,7 @@ interface StructuredProject {
                   <section class="structured-box traditional-experience">
                     <div class="traditional-experience-content">
                       @if (form.controls.referenceYears.value) {
-                        <p class="structured-years">Total IT Experience: {{ form.controls.referenceYears.value }}</p>
+                        <p class="structured-years">{{ form.controls.referenceYears.value }}</p>
                       }
                       <ul>
                         @for (entry of splitLines(form.controls.referenceExperienceSummary.value); track $index) {
@@ -294,7 +289,7 @@ interface StructuredProject {
 
                 <section class="structured-section traditional-section">
                   <h3 class="traditional-section-title">Work Experience</h3>
-                  <ul>
+                  <ul class="traditional-work-table">
                     @for (entry of splitLines(form.controls.referenceWorkHistory.value); track $index) {
                       <li>{{ entry }}</li>
                     }
@@ -405,6 +400,11 @@ interface StructuredProject {
               </div>
             }
           </div>
+          <div class="actions-row preview-actions">
+            <button type="button" class="button button-secondary" (click)="resetForm()">Reset</button>
+            <button type="button" class="button" (click)="downloadPdf()">Download PDF</button>
+            <button type="button" class="button" (click)="downloadDocx()">Download DOCX</button>
+          </div>
         </div>
       </div>
     </section>
@@ -510,7 +510,7 @@ export class BuilderPage {
       { label: 'Client', value: project.client },
       { label: 'Project', value: project.name },
       { label: 'Type', value: project.type },
-      { label: 'Technologies', value: project.technologies },
+      { label: 'Technology Used', value: project.technologies },
       { label: 'Database', value: project.database },
       { label: 'Role', value: project.role },
       { label: 'Tools', value: project.tools }
@@ -538,12 +538,14 @@ export class BuilderPage {
     const options = {
       margin: this.isStructuredTemplate() ? 0 : 2,
       filename: `${(this.form.get('fullName')?.value || 'resume').trim() || 'resume'}.pdf`,
-      // html2pdf rasterises the preview before placing it in the PDF.  Render at
-      // print resolution and keep the image lossless so small resume text stays
-      // sharp when the PDF is viewed or printed.
-      image: { type: 'png' as const, quality: 1 },
-      html2canvas: { scale: 5, useCORS: true, logging: false },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const, compress: true }
+      // html2pdf first paints the resume into a canvas. High-resolution PNGs can
+      // exceed some PDF viewers' canvas/image limits and display as coloured
+      // stripes. A high-quality JPEG at print-safe resolution is reliable across
+      // browsers and still keeps the small resume text crisp.
+      image: { type: 'jpeg' as const, quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const, compress: false },
+      pagebreak: { mode: ['css', 'legacy'] }
     };
 
     await html2pdf().set(options).from(element.nativeElement).save();
