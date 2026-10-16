@@ -443,22 +443,22 @@ export class BuilderPage {
     education: ['B.A. in Interaction Design · University of Washington · 2018'],
     projects: ['Resume Maker · Built a responsive resume generator with live preview and export features.\nPortfolio Redesign · Reworked design system for 3 product lines and launched an improved mobile experience.'],
     skills: ['UX strategy, Figma, Design systems, Prototyping, Research synthesis, Product thinking'],
-    referenceObjective: [''],
-    referenceYears: [''],
-    referenceExperienceSummary: [''],
-    referenceTechnologies: [''],
-    referenceTools: [''],
-    referenceDatabases: [''],
-    referenceOperatingSystems: [''],
-    referenceWorkHistory: [''],
-    referenceTraining: [''],
-    referenceTrainingTechnologies: [''],
-    referenceTrainingTools: [''],
+    referenceObjective: ['Software professional focused on building dependable, user-friendly applications and delivering practical solutions in collaborative teams.'],
+    referenceYears: ['5 years of experience'],
+    referenceExperienceSummary: ['Experience delivering web applications across the full development lifecycle.\nComfortable working with modern front-end, back-end, and API technologies.\nCollaborates effectively with product, QA, and engineering teams.'],
+    referenceTechnologies: ['JavaScript, TypeScript, Angular, Node.js, REST APIs'],
+    referenceTools: ['Git, VS Code, Postman, Jira'],
+    referenceDatabases: ['PostgreSQL, MySQL'],
+    referenceOperatingSystems: ['Windows, macOS, Linux'],
+    referenceWorkHistory: ['Software Developer · Example Company · 2022–Present\nJunior Developer · Example Studio · 2020–2022'],
+    referenceTraining: ['Completed practical full-stack development training focused on building and supporting production-ready web applications.'],
+    referenceTrainingTechnologies: ['Angular, TypeScript, Node.js, REST APIs'],
+    referenceTrainingTools: ['Git, VS Code, Postman'],
     referenceGithub: [''],
     referenceDeclaration: [''],
     referencePlace: [''],
     referenceSignature: [''],
-    projectOne: this.createProjectGroup(),
+    projectOne: this.createProjectGroup(true),
     projectTwo: this.createProjectGroup(),
     projectThree: this.createProjectGroup()
   });
@@ -596,17 +596,17 @@ export class BuilderPage {
     URL.revokeObjectURL(url);
   }
 
-  private createProjectGroup() {
+  private createProjectGroup(includeSample = false) {
     return this.fb.group({
-      client: [''],
-      name: [''],
-      type: [''],
-      technologies: [''],
-      database: [''],
-      role: [''],
-      tools: [''],
-      responsibilities: [''],
-      description: ['']
+      client: [includeSample ? 'Example Client' : ''],
+      name: [includeSample ? 'Sample Project' : ''],
+      type: [includeSample ? 'Web Application' : ''],
+      technologies: [includeSample ? 'Angular, TypeScript, REST APIs' : ''],
+      database: [includeSample ? 'PostgreSQL' : ''],
+      role: [includeSample ? 'Software Developer' : ''],
+      tools: [includeSample ? 'VS Code, Git, Postman' : ''],
+      responsibilities: [includeSample ? 'Built reusable user-interface components\nWorked with APIs and tested feature flows' : ''],
+      description: [includeSample ? 'A sample project entry showing how project details, responsibilities, and descriptions appear in the Traditional template.' : '']
     });
   }
 

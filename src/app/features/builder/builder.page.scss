@@ -274,7 +274,10 @@
 .resume-preview[data-template='structured-professional'] .traditional-experience { margin-top: 0.05rem; border-color: #d0d0d0; }
 .resume-preview[data-template='structured-professional'] .traditional-experience-content { padding: 0.3rem 0.55rem; }
 .resume-preview[data-template='structured-professional'] .traditional-experience-content .structured-years { margin: 0 0 0.9rem; }
-.resume-preview[data-template='structured-professional'] .traditional-experience-content .structured-years { white-space: pre-wrap; }
+.resume-preview[data-template='structured-professional'] .traditional-experience-content .structured-years {
+  color: #000;
+  white-space: pre-wrap;
+}
 .resume-preview[data-template='structured-professional'] .traditional-experience-content ul { margin: 0; padding-left: 1.4rem; }
 .resume-preview[data-template='structured-professional'] .traditional-section { margin: 0 0 1.6rem; }
 .resume-preview[data-template='structured-professional'] .traditional-section > .traditional-section-title { margin-bottom: 0.05rem; }
