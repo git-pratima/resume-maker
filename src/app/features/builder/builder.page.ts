@@ -297,15 +297,20 @@ interface StructuredProject {
                 </section>
 
                 <section class="structured-section traditional-section">
-                  <h3 class="traditional-section-title">Professional Experience</h3>
+                  <h3 class="traditional-section-title">Professional Experience:</h3>
                   @if (form.controls.referenceTraining.value) {
                     <p>{{ form.controls.referenceTraining.value }}</p>
                   }
-                  @if (form.controls.referenceTrainingTechnologies.value) {
-                    <p><strong>Technologies:</strong> {{ form.controls.referenceTrainingTechnologies.value }}</p>
-                  }
-                  @if (form.controls.referenceTrainingTools.value) {
-                    <p><strong>Tools:</strong> {{ form.controls.referenceTrainingTools.value }}</p>
+                  @if (form.controls.referenceTrainingTechnologies.value || form.controls.referenceTrainingTools.value) {
+                    <p><strong>Technology and tools used during training</strong></p>
+                    <ul class="traditional-professional-list">
+                      @for (entry of splitItems(form.controls.referenceTrainingTechnologies.value); track $index) {
+                        <li>{{ entry }}</li>
+                      }
+                      @for (entry of splitItems(form.controls.referenceTrainingTools.value); track $index) {
+                        <li>{{ entry }}</li>
+                      }
+                    </ul>
                   }
                 </section>
 
@@ -521,6 +526,13 @@ export class BuilderPage {
     return (value ?? '')
       .split(/\n|\r\n/)
       .map((line) => line.trim())
+      .filter(Boolean);
+  }
+
+  protected splitItems(value: string | null | undefined): string[] {
+    return (value ?? '')
+      .split(/[,\n\r]+/)
+      .map((item) => item.trim())
       .filter(Boolean);
   }
 
