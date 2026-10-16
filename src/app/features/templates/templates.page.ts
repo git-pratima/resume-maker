@@ -21,11 +21,6 @@ import { ResumeTemplate, TemplateService } from '../../core/template.service';
       </div>
 
       <div class="filters" aria-label="Template filters">
-        <label class="field search-field">
-          <span>Search</span>
-          <input type="search" placeholder="Search templates" [value]="query()" (input)="query.set($any($event.target).value)" />
-        </label>
-
         <label class="field">
           <span>Category</span>
           <select [value]="category()" (change)="category.set($any($event.target).value)">
@@ -54,10 +49,6 @@ import { ResumeTemplate, TemplateService } from '../../core/template.service';
           </select>
         </label>
 
-        <label class="toggle-field">
-          <input type="checkbox" [checked]="atsOnly()" (change)="atsOnly.set($any($event.target).checked)" />
-          <span>ATS-friendly only</span>
-        </label>
       </div>
 
       @if (filteredTemplates().length) {
@@ -65,10 +56,27 @@ import { ResumeTemplate, TemplateService } from '../../core/template.service';
           @for (template of filteredTemplates(); track template.id) {
             <article class="template-card" [class.is-selected]="templates.selected()?.id === template.id">
               <div class="template-preview" [style.--accent]="template.accent" aria-hidden="true">
-                <i></i>
-                <b></b>
-                <b></b>
-                <b></b>
+                <div class="template-preview-sheet" [class.two-column]="template.layout === 'Two-column'">
+                  <header class="sample-header">
+                    <strong>{{ template.sample.name }}</strong>
+                    <span>{{ template.sample.contact }}</span>
+                    <small>{{ template.sample.title }}</small>
+                  </header>
+                  <div class="sample-summary">
+                    <b>PROFILE</b>
+                    <p>{{ template.sample.summary }}</p>
+                  </div>
+                  <div class="sample-details">
+                    <div>
+                      <b>EXPERIENCE</b>
+                      <p>{{ template.sample.experience }}</p>
+                    </div>
+                    <div>
+                      <b>SKILLS</b>
+                      <p>{{ template.sample.skills }}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div class="card-body">
                 <div class="card-header">
@@ -93,8 +101,8 @@ import { ResumeTemplate, TemplateService } from '../../core/template.service';
         </div>
       } @else {
         <div class="empty-state">
-          <h3>No templates match your search.</h3>
-          <p>Try clearing one or more filters to see more options.</p>
+          <h3>No templates match these filters.</h3>
+          <p>Try choosing a different category or layout.</p>
         </div>
       }
     </section>
@@ -103,34 +111,22 @@ import { ResumeTemplate, TemplateService } from '../../core/template.service';
 })
 export class TemplatesPage {
   protected readonly templates = inject(TemplateService);
-  protected readonly query = signal('');
   protected readonly category = signal('All');
   protected readonly layout = signal('All');
   protected readonly sortBy = signal<'name' | 'category'>('name');
-  protected readonly atsOnly = signal(false);
 
   protected readonly categories = Array.from(new Set(this.templates.templates.map((template) => template.category)));
   protected readonly layouts = Array.from(new Set(this.templates.templates.map((template) => template.layout)));
 
   protected readonly filteredTemplates = computed(() => {
-    const normalizedQuery = this.query().trim().toLowerCase();
     const category = this.category();
     const layout = this.layout();
     const sortBy = this.sortBy();
 
     let results = this.templates.templates.filter((template) => {
-      const matchesQuery =
-        !normalizedQuery ||
-        [template.name, template.description, template.category, template.layout]
-          .join(' ')
-          .toLowerCase()
-          .includes(normalizedQuery);
-
       const matchesCategory = category === 'All' || template.category === category;
       const matchesLayout = layout === 'All' || template.layout === layout;
-      const matchesAts = !this.atsOnly() || template.atsFriendly;
-
-      return matchesQuery && matchesCategory && matchesLayout && matchesAts;
+      return matchesCategory && matchesLayout;
     });
 
     results = [...results].sort((a, b) => {

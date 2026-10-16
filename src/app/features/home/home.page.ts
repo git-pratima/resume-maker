@@ -75,7 +75,28 @@ import { TemplateService } from '../../core/template.service';
       <div class="template-grid compact">
         @for (template of featuredTemplates; track template.id) {
           <article class="feature-card">
-            <div class="thumb" [style.--accent]="template.accent"></div>
+            <div class="thumb" [style.--accent]="template.accent" aria-hidden="true">
+              <div class="thumb-sheet">
+                <header>
+                  <strong>{{ template.sample.name }}</strong>
+                  <span>{{ template.sample.title }}</span>
+                </header>
+                <section>
+                  <b>PROFILE</b>
+                  <p>{{ template.sample.summary }}</p>
+                </section>
+                <section class="thumb-details">
+                  <div>
+                    <b>EXPERIENCE</b>
+                    <p>{{ template.sample.experience }}</p>
+                  </div>
+                  <div>
+                    <b>SKILLS</b>
+                    <p>{{ template.sample.skills }}</p>
+                  </div>
+                </section>
+              </div>
+            </div>
             <div class="card-body">
               <div class="card-head">
                 <h3>{{ template.name }}</h3>
