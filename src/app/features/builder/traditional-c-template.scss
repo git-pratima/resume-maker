@@ -6,3 +6,20 @@
 .resume-preview.traditional-c-template {
   box-sizing: border-box;
 }
+
+.customization-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.editable-table-row {
+  display: grid;
+  grid-template-columns: minmax(9rem, 0.7fr) minmax(12rem, 1.3fr) auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .editable-table-row { grid-template-columns: 1fr; }
+}

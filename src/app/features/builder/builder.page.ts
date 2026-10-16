@@ -19,6 +19,8 @@ interface StructuredProject {
   description: string;
 }
 
+interface EditableTableRow { id: string; label: string; value: string; }
+
 @Component({
   standalone: true,
   imports: [ReactiveFormsModule],
@@ -75,6 +77,18 @@ interface StructuredProject {
 
           @if (isStructuredTemplate()) {
             <div class="reference-fields">
+              @if (isTraditionalC()) {
+                <div class="reference-field-group">
+                  <h2>Section titles</h2>
+                  <p class="customization-hint">Rename any heading shown in the Traditional-C resume.</p>
+                  @for (title of editableSectionTitles; track title.key) {
+                    <label>
+                      <span>{{ title.default }}</span>
+                      <input [value]="sectionTitle(title.key, title.default)" (input)="updateSectionTitle(title.key, $any($event.target).value)" />
+                    </label>
+                  }
+                </div>
+              }
               <label>
                 <span>Career objective</span>
                 <textarea formControlName="referenceObjective"></textarea>
@@ -98,6 +112,17 @@ interface StructuredProject {
 
               <div class="reference-field-group">
                 <h2>Technical skills</h2>
+                @if (isTraditionalC()) {
+                  <p class="customization-hint">Edit, remove, or add rows for the Traditional-C technical-skills table.</p>
+                  @for (row of technicalSkillRows(); track row.id) {
+                    <div class="editable-table-row">
+                      <input [value]="row.label" aria-label="Technical skill row label" (input)="updateTechnicalSkillRow(row.id, 'label', $any($event.target).value)" />
+                      <input [value]="row.value" aria-label="Technical skill row value" (input)="updateTechnicalSkillRow(row.id, 'value', $any($event.target).value)" />
+                      <button type="button" class="button button-secondary button-small" (click)="removeTechnicalSkillRow(row.id)">Remove</button>
+                    </div>
+                  }
+                  <button type="button" class="button button-secondary add-project-button" (click)="addTechnicalSkillRow()">Add skill row</button>
+                } @else {
                 <label>
                   <span>Languages and technologies</span>
                   <textarea formControlName="referenceTechnologies"></textarea>
@@ -114,6 +139,7 @@ interface StructuredProject {
                   <span>Operating systems</span>
                   <textarea formControlName="referenceOperatingSystems"></textarea>
                 </label>
+                }
               </div>
 
               <div class="reference-field-group">
@@ -145,6 +171,17 @@ interface StructuredProject {
                 @for (project of visibleProjectForms(); track project.key; let index = $index) {
                   <fieldset [formGroupName]="project.key">
                     <legend>Project {{ index + 1 }}</legend>
+                    @if (isTraditionalC()) {
+                      <p class="customization-hint">Customize this project table’s rows, labels, and values.</p>
+                      @for (row of editableProjectRows(project.key); track row.id) {
+                        <div class="editable-table-row">
+                          <input [value]="row.label" aria-label="Project row label" (input)="updateProjectRow(project.key, row.id, 'label', $any($event.target).value)" />
+                          <input [value]="row.value" aria-label="Project row value" (input)="updateProjectRow(project.key, row.id, 'value', $any($event.target).value)" />
+                          <button type="button" class="button button-secondary button-small" (click)="removeProjectRow(project.key, row.id)">Remove</button>
+                        </div>
+                      }
+                      <button type="button" class="button button-secondary add-project-button" (click)="addProjectRow(project.key)">Add project row</button>
+                    } @else {
                     <label>
                       <span>Client</span>
                       <input formControlName="client" />
@@ -181,6 +218,7 @@ interface StructuredProject {
                       <span>Description</span>
                       <textarea formControlName="description"></textarea>
                     </label>
+                    }
                   </fieldset>
                 }
                 @if (visibleProjectForms().length < projectForms.length) {
@@ -262,14 +300,14 @@ interface StructuredProject {
                 </header>
 
                 <div class="traditional-box-group">
-                  <h3 class="traditional-section-title">Objective</h3>
+                  <h3 class="traditional-section-title">{{ sectionTitle('objective', 'Objective') }}</h3>
                   <section class="structured-box traditional-objective-value">
                     <p>{{ form.controls.referenceObjective.value }}</p>
                   </section>
                 </div>
 
                 <div class="traditional-experience-group">
-                  <h3 class="traditional-section-title">Experience Summary</h3>
+                  <h3 class="traditional-section-title">{{ sectionTitle('experienceSummary', 'Experience Summary') }}</h3>
                   <section class="structured-box traditional-experience">
                     <div class="traditional-experience-content">
                       @if (form.controls.referenceYears.value) {
@@ -285,13 +323,13 @@ interface StructuredProject {
                 </div>
 
                 <section class="structured-section traditional-section">
-                  <h3 class="traditional-section-title">Technical Skills</h3>
+                  <h3 class="traditional-section-title">{{ sectionTitle('technicalSkills', 'Technical Skills') }}</h3>
                   <div class="structured-skill-grid">
-                    @for (skill of skillCategories; track skill.label) {
-                      @if (form.controls[skill.control].value) {
+                    @for (skill of displayedTechnicalSkillRows(); track skill.id) {
+                      @if (skill.value) {
                         <div class="structured-skill-row">
                           <strong>{{ skill.label }}</strong>
-                          <span>{{ form.controls[skill.control].value }}</span>
+                          <span>{{ skill.value }}</span>
                         </div>
                       }
                     }
@@ -299,7 +337,7 @@ interface StructuredProject {
                 </section>
 
                 <section class="structured-section traditional-section">
-                  <h3 class="traditional-section-title">Work Experience</h3>
+                  <h3 class="traditional-section-title">{{ sectionTitle('workExperience', 'Work Experience') }}</h3>
                   <ul class="traditional-work-table">
                     @for (entry of splitLines(form.controls.referenceWorkHistory.value); track $index) {
                       <li>{{ entry }}</li>
@@ -308,7 +346,7 @@ interface StructuredProject {
                 </section>
 
                 <section class="structured-section traditional-section">
-                  <h3 class="traditional-section-title">Professional Experience:</h3>
+                  <h3 class="traditional-section-title">{{ sectionTitle('professionalExperience', 'Professional Experience:') }}</h3>
                   @if (form.controls.referenceTraining.value) {
                     <p>{{ form.controls.referenceTraining.value }}</p>
                   }
@@ -334,9 +372,9 @@ interface StructuredProject {
                       @if (projectIndex > 0) {
                         <div class="pdf-page-start-rule" aria-hidden="true"></div>
                       }
-                      <h3 class="traditional-section-title">Project - {{ project.number }}</h3>
+                      <h3 class="traditional-section-title">{{ sectionTitle('project', 'Project') }} - {{ project.number }}</h3>
                       <dl>
-                        @for (field of projectFields(project); track field.label) {
+                        @for (field of displayedProjectRows(project); track field.id) {
                           @if (field.value) {
                             <div>
                               <dt>{{ field.label }}</dt>
@@ -457,6 +495,7 @@ export class BuilderPage {
   protected readonly isStructuredTemplate = computed(
     () => ['structured-professional', 'traditional-c'].includes(this.selectedTemplate()?.id ?? '')
   );
+  protected readonly isTraditionalC = computed(() => this.selectedTemplate()?.id === 'traditional-c');
   protected readonly previewTemplateId = computed(() =>
     this.isStructuredTemplate() ? 'structured-professional' : (this.selectedTemplate()?.id ?? 'classic')
   );
@@ -466,6 +505,22 @@ export class BuilderPage {
     { label: 'Databases', control: 'referenceDatabases' },
     { label: 'Operating systems', control: 'referenceOperatingSystems' }
   ] as const;
+  protected readonly editableSectionTitles = [
+    { key: 'objective', default: 'Objective' },
+    { key: 'experienceSummary', default: 'Experience Summary' },
+    { key: 'technicalSkills', default: 'Technical Skills' },
+    { key: 'workExperience', default: 'Work Experience' },
+    { key: 'professionalExperience', default: 'Professional Experience:' },
+    { key: 'project', default: 'Project' }
+  ] as const;
+  private readonly customSectionTitles = signal<Record<string, string>>({});
+  protected readonly technicalSkillRows = signal<EditableTableRow[]>([
+    { id: 'technologies', label: 'Languages and technologies', value: 'JavaScript, TypeScript, Angular, Node.js, REST APIs' },
+    { id: 'tools', label: 'Tools', value: 'Git, VS Code, Postman, Jira' },
+    { id: 'databases', label: 'Databases', value: 'PostgreSQL, MySQL' },
+    { id: 'operating-systems', label: 'Operating systems', value: 'Windows, macOS, Linux' }
+  ]);
+  private readonly customProjectRows = signal<Record<string, EditableTableRow[]>>({});
   protected readonly projectForms = [
     { key: 'projectOne', number: 1 },
     { key: 'projectTwo', number: 2 },
@@ -524,6 +579,59 @@ export class BuilderPage {
     this.templates.select(templateId);
   }
 
+  protected sectionTitle(key: string, fallback: string): string {
+    return this.customSectionTitles()[key] || fallback;
+  }
+
+  protected updateSectionTitle(key: string, value: string): void {
+    this.customSectionTitles.update((titles) => ({ ...titles, [key]: value }));
+  }
+
+  protected displayedTechnicalSkillRows(): EditableTableRow[] {
+    if (this.isTraditionalC()) {
+      return this.technicalSkillRows();
+    }
+    return this.skillCategories.map(({ label, control }) => ({ id: control, label, value: this.form.controls[control].value ?? '' }));
+  }
+
+  protected updateTechnicalSkillRow(id: string, field: 'label' | 'value', value: string): void {
+    this.technicalSkillRows.update((rows) => rows.map((row) => row.id === id ? { ...row, [field]: value } : row));
+  }
+
+  protected addTechnicalSkillRow(): void {
+    this.technicalSkillRows.update((rows) => [...rows, { id: `skill-${Date.now()}`, label: 'New skill', value: '' }]);
+  }
+
+  protected removeTechnicalSkillRow(id: string): void {
+    this.technicalSkillRows.update((rows) => rows.filter((row) => row.id !== id));
+  }
+
+  protected editableProjectRows(key: string): EditableTableRow[] {
+    return this.customProjectRows()[key] ?? this.defaultProjectRows(key);
+  }
+
+  protected displayedProjectRows(project: StructuredProject): EditableTableRow[] {
+    return this.isTraditionalC() ? this.editableProjectRows(project.key) : this.projectFields(project);
+  }
+
+  protected updateProjectRow(projectKey: string, id: string, field: 'label' | 'value', value: string): void {
+    this.customProjectRows.update((rows) => ({
+      ...rows,
+      [projectKey]: this.editableProjectRows(projectKey).map((row) => row.id === id ? { ...row, [field]: value } : row)
+    }));
+  }
+
+  protected addProjectRow(projectKey: string): void {
+    this.customProjectRows.update((rows) => ({
+      ...rows,
+      [projectKey]: [...this.editableProjectRows(projectKey), { id: `project-row-${Date.now()}`, label: 'New field', value: '' }]
+    }));
+  }
+
+  protected removeProjectRow(projectKey: string, id: string): void {
+    this.customProjectRows.update((rows) => ({ ...rows, [projectKey]: this.editableProjectRows(projectKey).filter((row) => row.id !== id) }));
+  }
+
   protected resetForm(): void {
     this.form.reset();
     this.visibleProjectCount.set(0);
@@ -562,15 +670,38 @@ export class BuilderPage {
     return Object.entries(project).some(([key, value]) => key !== 'key' && key !== 'number' && Boolean(value));
   }
 
-  protected projectFields(project: StructuredProject): Array<{ label: string; value: string }> {
+  private defaultProjectRows(key: string): EditableTableRow[] {
+    const projectControl = key === 'projectOne'
+      ? this.form.controls.projectOne
+      : key === 'projectTwo'
+        ? this.form.controls.projectTwo
+        : key === 'projectThree'
+          ? this.form.controls.projectThree
+          : null;
+    const project = projectControl?.getRawValue();
+    if (!project) {
+      return [];
+    }
     return [
-      { label: 'Client', value: project.client },
-      { label: 'Project', value: project.name },
-      { label: 'Type', value: project.type },
-      { label: 'Technology Used', value: project.technologies },
-      { label: 'Database', value: project.database },
-      { label: 'Role', value: project.role },
-      { label: 'Tools', value: project.tools }
+      { id: 'client', label: 'Client', value: project.client ?? '' },
+      { id: 'project', label: 'Project', value: project.name ?? '' },
+      { id: 'type', label: 'Type', value: project.type ?? '' },
+      { id: 'technology', label: 'Technology Used', value: project.technologies ?? '' },
+      { id: 'database', label: 'Database', value: project.database ?? '' },
+      { id: 'role', label: 'Role', value: project.role ?? '' },
+      { id: 'tools', label: 'Tools', value: project.tools ?? '' }
+    ];
+  }
+
+  protected projectFields(project: StructuredProject): EditableTableRow[] {
+    return [
+      { id: 'client', label: 'Client', value: project.client },
+      { id: 'project', label: 'Project', value: project.name },
+      { id: 'type', label: 'Type', value: project.type },
+      { id: 'technology', label: 'Technology Used', value: project.technologies },
+      { id: 'database', label: 'Database', value: project.database },
+      { id: 'role', label: 'Role', value: project.role },
+      { id: 'tools', label: 'Tools', value: project.tools }
     ];
   }
 
@@ -775,16 +906,14 @@ export class BuilderPage {
       );
     };
 
-    addSection('Career Objective', [this.form.controls.referenceObjective.value ?? '']);
-    addSection('Experience Summary', [
+    addSection(this.sectionTitle('objective', 'Objective'), [this.form.controls.referenceObjective.value ?? '']);
+    addSection(this.sectionTitle('experienceSummary', 'Experience Summary'), [
       this.form.controls.referenceYears.value ?? '',
       ...this.splitLines(this.form.controls.referenceExperienceSummary.value)
     ]);
-    addSection('Technical Skills', this.skillCategories.map(({ label, control }) =>
-      `${label}: ${this.form.controls[control].value ?? ''}`
-    ));
-    addSection('Work Experience', this.splitLines(this.form.controls.referenceWorkHistory.value));
-    addSection('Professional Experience and Training', [
+    addSection(this.sectionTitle('technicalSkills', 'Technical Skills'), this.displayedTechnicalSkillRows().map(({ label, value }) => `${label}: ${value}`));
+    addSection(this.sectionTitle('workExperience', 'Work Experience'), this.splitLines(this.form.controls.referenceWorkHistory.value));
+    addSection(this.sectionTitle('professionalExperience', 'Professional Experience:'), [
       this.form.controls.referenceTraining.value ?? '',
       `Technologies: ${this.form.controls.referenceTrainingTechnologies.value ?? ''}`,
       `Tools: ${this.form.controls.referenceTrainingTools.value ?? ''}`
@@ -794,8 +923,8 @@ export class BuilderPage {
       if (!this.hasProjectContent(project)) {
         continue;
       }
-      addSection(`Project ${project.number}`, [
-        ...this.projectFields(project).map(({ label, value }) => `${label}: ${value}`),
+      addSection(`${this.sectionTitle('project', 'Project')} ${project.number}`, [
+        ...this.displayedProjectRows(project).map(({ label, value }) => `${label}: ${value}`),
         ...this.splitLines(project.responsibilities).map((line) => `Responsibility: ${line}`),
         project.description ? `Description: ${project.description}` : ''
       ]);
