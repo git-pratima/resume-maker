@@ -243,8 +243,10 @@ interface StructuredProject {
             @if (isStructuredTemplate()) {
               <article class="structured-resume">
                 <header class="structured-header">
-                  <h2>{{ form.controls.fullName.value || 'Your Name' }}</h2>
-                  <p>{{ form.controls.title.value || 'Professional Title' }}</p>
+                  <div class="traditional-identity">
+                    <h2>{{ form.controls.fullName.value || 'Your Name' }}</h2>
+                    <p>{{ form.controls.title.value || 'Professional Title' }}</p>
+                  </div>
                   <div class="structured-contact">
                     @if (form.controls.location.value) { <span>{{ form.controls.location.value }}</span> }
                     @if (form.controls.email.value) { <span>{{ form.controls.email.value }}</span> }
@@ -253,25 +255,31 @@ interface StructuredProject {
                   </div>
                 </header>
 
-                <section class="structured-box">
-                  <h3>Career Objective</h3>
-                  <p>{{ form.controls.referenceObjective.value }}</p>
-                </section>
+                <div class="traditional-box-group">
+                  <h3 class="traditional-section-title">Objective</h3>
+                  <section class="structured-box traditional-objective-value">
+                    <p>{{ form.controls.referenceObjective.value }}</p>
+                  </section>
+                </div>
 
-                <section class="structured-section">
-                  <h3>Experience Summary</h3>
-                  @if (form.controls.referenceYears.value) {
-                    <p class="structured-years">{{ form.controls.referenceYears.value }} of total experience</p>
-                  }
-                  <ul>
-                    @for (entry of splitLines(form.controls.referenceExperienceSummary.value); track $index) {
-                      <li>{{ entry }}</li>
-                    }
-                  </ul>
-                </section>
+                <div class="traditional-experience-group">
+                  <h3 class="traditional-section-title">Experience Summary</h3>
+                  <section class="structured-box traditional-experience">
+                    <div class="traditional-experience-content">
+                      @if (form.controls.referenceYears.value) {
+                        <p class="structured-years">Total IT Experience: {{ form.controls.referenceYears.value }}</p>
+                      }
+                      <ul>
+                        @for (entry of splitLines(form.controls.referenceExperienceSummary.value); track $index) {
+                          <li>{{ entry }}</li>
+                        }
+                      </ul>
+                    </div>
+                  </section>
+                </div>
 
-                <section class="structured-section">
-                  <h3>Technical Skills</h3>
+                <section class="structured-section traditional-section">
+                  <h3 class="traditional-section-title">Technical Skills</h3>
                   <div class="structured-skill-grid">
                     @for (skill of skillCategories; track skill.label) {
                       @if (form.controls[skill.control].value) {
@@ -284,8 +292,8 @@ interface StructuredProject {
                   </div>
                 </section>
 
-                <section class="structured-section">
-                  <h3>Work Experience</h3>
+                <section class="structured-section traditional-section">
+                  <h3 class="traditional-section-title">Work Experience</h3>
                   <ul>
                     @for (entry of splitLines(form.controls.referenceWorkHistory.value); track $index) {
                       <li>{{ entry }}</li>
@@ -293,8 +301,8 @@ interface StructuredProject {
                   </ul>
                 </section>
 
-                <section class="structured-section">
-                  <h3>Professional Experience and Training</h3>
+                <section class="structured-section traditional-section">
+                  <h3 class="traditional-section-title">Professional Experience</h3>
                   @if (form.controls.referenceTraining.value) {
                     <p>{{ form.controls.referenceTraining.value }}</p>
                   }
@@ -309,7 +317,7 @@ interface StructuredProject {
                 @for (project of structuredProjects; track project.key) {
                   @if (hasProjectContent(project)) {
                     <section class="structured-project">
-                      <h3>Project {{ project.number }}</h3>
+                      <h3 class="traditional-section-title">Project - {{ project.number }}</h3>
                       <dl>
                         @for (field of projectFields(project); track field.label) {
                           @if (field.value) {
