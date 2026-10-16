@@ -240,7 +240,11 @@ interface StructuredProject {
             <span class="preview-template">{{ selectedTemplate()?.name ?? 'Classic' }}</span>
           </div>
 
-          <div #resumePreview class="resume-preview" [attr.data-template]="selectedTemplate()?.id ?? 'classic'">
+          <div
+            #resumePreview
+            class="resume-preview"
+            [class.pdf-export]="isPdfExporting()"
+            [attr.data-template]="selectedTemplate()?.id ?? 'classic'">
             @if (isStructuredTemplate()) {
               <article class="structured-resume">
                 <header class="structured-header">
@@ -320,9 +324,15 @@ interface StructuredProject {
                   }
                 </section>
 
-                @for (project of structuredProjects; track project.key) {
+                @for (project of structuredProjects; track project.key; let projectIndex = $index) {
                   @if (hasProjectContent(project)) {
-                    <section class="structured-project">
+                    <section
+                      class="structured-project"
+                      [class.structured-project-page-start]="projectIndex > 0"
+                      [class.structured-project-page-end]="projectIndex < structuredProjects.length - 1">
+                      @if (projectIndex > 0) {
+                        <div class="pdf-page-start-rule" aria-hidden="true"></div>
+                      }
                       <h3 class="traditional-section-title">Project - {{ project.number }}</h3>
                       <dl>
                         @for (field of projectFields(project); track field.label) {
@@ -479,6 +489,7 @@ export class BuilderPage {
   });
 
   private readonly previewRef = viewChild<ElementRef<HTMLDivElement>>('resumePreview');
+  protected readonly isPdfExporting = signal(false);
 
   constructor() {
     this.route.queryParamMap.subscribe((params) => {
@@ -567,6 +578,9 @@ export class BuilderPage {
       return;
     }
 
+    this.isPdfExporting.set(this.isStructuredTemplate());
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+
     const html2pdf = (await import('html2pdf.js')).default;
     const options = {
       margin: this.isStructuredTemplate() ? 0 : 2,
@@ -585,6 +599,22 @@ export class BuilderPage {
         // extra lower padding so title text never overlaps its lower border.
         onclone: (document: Document) => {
           document
+            .querySelector<HTMLElement>(".resume-preview[data-template='structured-professional']")
+            ?.classList.add('pdf-export');
+          document
+            .querySelectorAll<HTMLElement>(
+              ".resume-preview[data-template='structured-professional'] .structured-project-page-start"
+            )
+            .forEach((project) => {
+              project.style.setProperty('margin-top', '0', 'important');
+              project.style.setProperty('padding-top', '18mm', 'important');
+
+              const rule = project.querySelector<HTMLElement>('.pdf-page-start-rule');
+              rule?.style.setProperty('display', 'block', 'important');
+              rule?.style.setProperty('border-top', '1px solid #dfe7f2', 'important');
+              rule?.style.setProperty('margin-bottom', '2mm', 'important');
+            });
+          document
             .querySelectorAll<HTMLElement>(
               ".resume-preview[data-template='structured-professional'] .traditional-section-title"
             )
@@ -602,7 +632,11 @@ export class BuilderPage {
       pagebreak: { mode: ['css', 'legacy'] }
     };
 
-    await html2pdf().set(options).from(element.nativeElement).save();
+    try {
+      await html2pdf().set(options).from(element.nativeElement).save();
+    } finally {
+      this.isPdfExporting.set(false);
+    }
   }
 
   protected async downloadDocx(): Promise<void> {
