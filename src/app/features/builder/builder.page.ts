@@ -638,6 +638,9 @@ export class BuilderPage {
             .forEach((title) => {
               title.style.setProperty('display', 'inline-block', 'important');
               title.style.setProperty('box-sizing', 'border-box', 'important');
+              title.style.setProperty('align-self', 'flex-start', 'important');
+              title.style.setProperty('width', 'max-content', 'important');
+              title.style.setProperty('max-width', '100%', 'important');
               title.style.setProperty('margin', '0 0 0.12rem', 'important');
               title.style.setProperty('padding', '0.04rem 0.45rem 0.24rem', 'important');
               title.style.setProperty('font-size', '10pt', 'important');
