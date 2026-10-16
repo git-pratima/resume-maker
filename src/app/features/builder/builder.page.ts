@@ -244,7 +244,8 @@ interface StructuredProject {
             #resumePreview
             class="resume-preview"
             [class.pdf-export]="isPdfExporting()"
-            [attr.data-template]="selectedTemplate()?.id ?? 'classic'">
+            [class.traditional-c-template]="selectedTemplate()?.id === 'traditional-c'"
+            [attr.data-template]="previewTemplateId()">
             @if (isStructuredTemplate()) {
               <article class="structured-resume">
                 <header class="structured-header">
@@ -446,7 +447,7 @@ interface StructuredProject {
       </div>
     </section>
   `,
-  styleUrl: './builder.page.scss'
+  styleUrls: ['./builder.page.scss', './traditional-c-template.scss']
 })
 export class BuilderPage {
   private readonly fb = inject(FormBuilder);
@@ -454,7 +455,10 @@ export class BuilderPage {
   protected readonly templates = inject(TemplateService);
   protected readonly selectedTemplate = computed(() => this.templates.selected());
   protected readonly isStructuredTemplate = computed(
-    () => this.selectedTemplate()?.id === 'structured-professional'
+    () => ['structured-professional', 'traditional-c'].includes(this.selectedTemplate()?.id ?? '')
+  );
+  protected readonly previewTemplateId = computed(() =>
+    this.isStructuredTemplate() ? 'structured-professional' : (this.selectedTemplate()?.id ?? 'classic')
   );
   protected readonly skillCategories = [
     { label: 'Languages and technologies', control: 'referenceTechnologies' },

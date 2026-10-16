@@ -33,7 +33,8 @@ export const RESUME_TEMPLATES: ResumeTemplate[] = [
   { id: 'minimal', name: 'Minimal', description: 'A quiet, refined design for clear, elegant career narratives.', category: 'Creative', layout: 'Minimal', accent: '#7c3aed', atsFriendly: true, sample: SAMPLE_RESUME },
   { id: 'executive', name: 'Executive', description: 'A leadership-focused template for managers and senior specialists.', category: 'Leadership', layout: 'Two-column', accent: '#b45309', atsFriendly: true, sample: SAMPLE_RESUME },
   { id: 'student', name: 'Student', description: 'A simple format that keeps internships, education, and skills front and center.', category: 'Entry-level', layout: 'Single-column', accent: '#db2777', atsFriendly: true, sample: SAMPLE_RESUME },
-  { id: 'structured-professional', name: 'Traditional', description: 'A detailed, table-led resume with a compact header and clearly grouped project experience.', category: 'Corporate', layout: 'Single-column', accent: '#475569', atsFriendly: true, sample: SAMPLE_RESUME }
+  { id: 'structured-professional', name: 'Traditional', description: 'A detailed, table-led resume with a compact header and clearly grouped project experience.', category: 'Corporate', layout: 'Single-column', accent: '#475569', atsFriendly: true, sample: SAMPLE_RESUME },
+  { id: 'traditional-c', name: 'Traditional-C', description: 'A complete replica of the Traditional template, ready for its own future customizations.', category: 'Corporate', layout: 'Single-column', accent: '#475569', atsFriendly: true, sample: SAMPLE_RESUME }
 ];
 
 @Injectable({ providedIn: 'root' })
