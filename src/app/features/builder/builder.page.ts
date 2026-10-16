@@ -643,6 +643,15 @@ export class BuilderPage {
               title.style.setProperty('font-size', '10pt', 'important');
               title.style.setProperty('line-height', '1', 'important');
             });
+          document
+            .querySelectorAll<HTMLElement>(
+              ".resume-preview[data-template='structured-professional'] .structured-project-page-start > .structured-footer"
+            )
+            .forEach((footer) => {
+              footer.style.setProperty('padding-bottom', '22mm', 'important');
+              footer.style.setProperty('border-bottom', '1px solid #111', 'important');
+              footer.style.setProperty('transform', 'translateY(-25mm)', 'important');
+            });
 
         }
       },

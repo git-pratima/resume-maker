@@ -343,7 +343,9 @@
 }
 .resume-preview.pdf-export[data-template='structured-professional'] .structured-project-page-start > .structured-footer {
   margin-top: auto;
-  padding-bottom: 12mm;
+  padding-bottom: 22mm;
+  border-bottom: 1px solid #dfe7f2;
+  transform: translateY(-25mm);
 }
 .pdf-page-start-rule { display: none; }
 .resume-preview.pdf-export[data-template='structured-professional'] .pdf-page-start-rule {
