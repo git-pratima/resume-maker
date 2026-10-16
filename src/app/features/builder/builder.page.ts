@@ -75,7 +75,32 @@ interface EditableTableRow { id: string; label: string; value: string; }
             </label>
           </div>
 
-          @if (isStructuredTemplate()) {
+          @if (isStudentTemplate()) {
+            <div class="reference-fields student-editor">
+              <p class="customization-hint">Every field below is editable. Use one line for each bullet or resume entry.</p>
+              <label><span>Education heading</span><input formControlName="studentEducationTitle" /></label>
+              <label><span>Education</span><textarea formControlName="studentEducation"></textarea></label>
+              <label><span>Technical skills heading</span><input formControlName="studentSkillsTitle" /></label>
+              <label><span>Technical skills (one skill per line)</span><textarea formControlName="studentSkills"></textarea></label>
+              <label><span>Certifications heading</span><input formControlName="studentCertificationsTitle" /></label>
+              <label><span>Certifications (one per line)</span><textarea formControlName="studentCertifications"></textarea></label>
+              <label><span>Projects heading</span><input formControlName="studentProjectsTitle" /></label>
+              <label><span>Projects (one per line)</span><textarea formControlName="studentProjects"></textarea></label>
+              <div class="form-grid two-up">
+                <label><span>Internship heading</span><input formControlName="studentInternshipTitle" /></label>
+                <label><span>Extracurricular heading</span><input formControlName="studentActivitiesTitle" /></label>
+                <label><span>Internship (one item per line)</span><textarea formControlName="studentInternship"></textarea></label>
+                <label><span>Activities (one item per line)</span><textarea formControlName="studentActivities"></textarea></label>
+              </div>
+              <label><span>Declaration heading</span><input formControlName="studentDeclarationTitle" /></label>
+              <label><span>Declaration</span><textarea formControlName="studentDeclaration"></textarea></label>
+              <div class="form-grid two-up">
+                <label><span>Place</span><input formControlName="studentPlace" /></label>
+                <label><span>Date</span><input formControlName="studentDate" /></label>
+                <label><span>Signature</span><input formControlName="studentSignature" /></label>
+              </div>
+            </div>
+          } @else if (isStructuredTemplate()) {
             <div class="reference-fields">
               @if (isTraditionalC()) {
                 <label>
@@ -304,7 +329,20 @@ interface EditableTableRow { id: string; label: string; value: string; }
             [class.pdf-export]="isPdfExporting()"
             [class.traditional-c-template]="selectedTemplate()?.id === 'traditional-c'"
             [attr.data-template]="previewTemplateId()">
-            @if (isStructuredTemplate()) {
+            @if (isStudentTemplate()) {
+              <article class="student-resume">
+                <header class="student-header">
+                  <h2>{{ form.controls.fullName.value || 'Your Name' }}</h2>
+                  <div>{{ form.controls.email.value }} &nbsp; | &nbsp; {{ form.controls.phone.value }} &nbsp; | &nbsp; {{ form.controls.website.value }} &nbsp; | &nbsp; {{ form.controls.location.value }}</div>
+                </header>
+                <section><h3>{{ form.controls.studentEducationTitle.value }}</h3><div class="student-education">@for (line of splitLines(form.controls.studentEducation.value); track $index) { <p>{{ line }}</p> }</div></section>
+                <section><h3>{{ form.controls.studentSkillsTitle.value }}</h3><ul>@for (line of splitLines(form.controls.studentSkills.value); track $index) { <li>{{ line }}</li> }</ul></section>
+                <section><h3>{{ form.controls.studentCertificationsTitle.value }}</h3><ul>@for (line of splitLines(form.controls.studentCertifications.value); track $index) { <li>{{ line }}</li> }</ul></section>
+                <section><h3>{{ form.controls.studentProjectsTitle.value }}</h3><ul>@for (line of splitLines(form.controls.studentProjects.value); track $index) { <li>{{ line }}</li> }</ul></section>
+                <div class="student-two-column"><section><h3>{{ form.controls.studentInternshipTitle.value }}</h3><ul>@for (line of splitLines(form.controls.studentInternship.value); track $index) { <li>{{ line }}</li> }</ul></section><section><h3>{{ form.controls.studentActivitiesTitle.value }}</h3><ul>@for (line of splitLines(form.controls.studentActivities.value); track $index) { <li>{{ line }}</li> }</ul></section></div>
+                <section class="student-declaration"><h3>{{ form.controls.studentDeclarationTitle.value }}</h3><p>{{ form.controls.studentDeclaration.value }}</p><p>Place: {{ form.controls.studentPlace.value }}</p><p>Date: {{ form.controls.studentDate.value }}</p><strong>{{ form.controls.studentSignature.value }}</strong></section>
+              </article>
+            } @else if (isStructuredTemplate()) {
               <article class="structured-resume">
                 <header class="structured-header">
                   <div class="traditional-identity">
@@ -516,6 +554,7 @@ export class BuilderPage {
     () => ['structured-professional', 'traditional-c'].includes(this.selectedTemplate()?.id ?? '')
   );
   protected readonly isTraditionalC = computed(() => this.selectedTemplate()?.id === 'traditional-c');
+  protected readonly isStudentTemplate = computed(() => this.selectedTemplate()?.id === 'student');
   protected readonly previewTemplateId = computed(() =>
     this.isStructuredTemplate() ? 'structured-professional' : (this.selectedTemplate()?.id ?? 'classic')
   );
@@ -555,6 +594,23 @@ export class BuilderPage {
     education: ['B.A. in Interaction Design · University of Washington · 2018'],
     projects: ['Resume Maker · Built a responsive resume generator with live preview and export features.\nPortfolio Redesign · Reworked design system for 3 product lines and launched an improved mobile experience.'],
     skills: ['UX strategy, Figma, Design systems, Prototyping, Research synthesis, Product thinking'],
+    studentEducationTitle: ['EDUCATION'],
+    studentEducation: ['Bachelor of Technology (B.Tech) in Computer Science\nIndian Institute of Technology (IIT), Delhi\nExpected Graduation: May 2027\nCGPA: 8.7/10  |  Relevant Coursework: Data Structures, Algorithms, Databases, Machine Learning, Web Development\n\nSenior Secondary (Class XII)\nDelhi Public School, RK Puram\nPercentage: 92% (CBSE Board)\n\nMatriculation (Class X)\nSt. Xavier\'s School, New Delhi\nScore: 95%'],
+    studentSkillsTitle: ['TECHNICAL SKILLS'],
+    studentSkills: ['Programming Languages: Java, Python, C++\nWeb Development: Angular, Spring Boot, HTML, CSS, JavaScript\nDatabases: PostgreSQL, MySQL\nTools & Platforms: Git, Docker, Google Cloud Platform'],
+    studentCertificationsTitle: ['CERTIFICATIONS'],
+    studentCertifications: ['Certified in Machine Learning by Coursera\nWeb Development Certificate from Udemy'],
+    studentProjectsTitle: ['PROJECTS'],
+    studentProjects: ['Resume Maker Web Application · Built using Angular and Spring Boot. Generated resumes in PDF/Word formats.\nSmart Attendance System · Developed a face-recognition based attendance tracker using Python and OpenCV.'],
+    studentInternshipTitle: ['INTERNSHIP'],
+    studentInternship: ['Software Development Intern · Infosys, Bengaluru\nJune 2026 – August 2026\nWorked on backend APIs using Spring Boot.\nImproved query performance by 25%.'],
+    studentActivitiesTitle: ['EXTRACURRICULAR ACTIVITIES'],
+    studentActivities: ['Member, Coding Club IIT Delhi – Organized hackathons.\nVolunteer, Teach for India – Tutored underprivileged students\nSports: Represented college in Badminton (Inter-IIT Tournament)'],
+    studentDeclarationTitle: ['DECLARATION'],
+    studentDeclaration: ['I hereby declare that the information given above is true and correct to the best of my knowledge and belief.'],
+    studentPlace: ['Bengaluru'],
+    studentDate: ['[Date]'],
+    studentSignature: ['Rahul Sharma'],
     referenceObjective: ['Software professional focused on building dependable, user-friendly applications and delivering practical solutions in collaborative teams.'],
     referenceYears: ['5 years of experience'],
     referenceExperienceSummary: ['Experience delivering web applications across the full development lifecycle.\nComfortable working with modern front-end, back-end, and API technologies.\nCollaborates effectively with product, QA, and engineering teams.'],
@@ -741,7 +797,7 @@ export class BuilderPage {
       return;
     }
 
-    this.isPdfExporting.set(this.isStructuredTemplate());
+    this.isPdfExporting.set(this.isStructuredTemplate() || this.isStudentTemplate());
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 
     const html2pdf = (await import('html2pdf.js')).default;
