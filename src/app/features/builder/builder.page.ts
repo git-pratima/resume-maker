@@ -1,5 +1,6 @@
 ﻿import { Component, computed, ElementRef, inject, viewChild } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Document as DocxDocument, HeadingLevel, Packer, Paragraph, TextRun } from 'docx';
 import { TemplateService } from '../../core/template.service';
@@ -141,7 +142,7 @@ interface StructuredProject {
 
               <div class="reference-field-group">
                 <h2>Project details</h2>
-                @for (project of projectForms; track project.key; let index = $index) {
+                @for (project of visibleProjectForms(); track project.key; let index = $index) {
                   <fieldset [formGroupName]="project.key">
                     <legend>Project {{ index + 1 }}</legend>
                     <label>
@@ -181,6 +182,11 @@ interface StructuredProject {
                       <textarea formControlName="description"></textarea>
                     </label>
                   </fieldset>
+                }
+                @if (visibleProjectForms().length < projectForms.length) {
+                  <button type="button" class="button button-secondary add-project-button" (click)="addProject()">
+                    Add Project
+                  </button>
                 }
               </div>
 
@@ -435,6 +441,10 @@ export class BuilderPage {
     { key: 'projectTwo', number: 2 },
     { key: 'projectThree', number: 3 }
   ] as const;
+  private readonly visibleProjectCount = signal(0);
+  protected readonly visibleProjectForms = computed(() =>
+    this.projectForms.slice(0, this.visibleProjectCount())
+  );
 
   protected readonly form = this.fb.group({
     fullName: ['Jordan Lee'],
@@ -485,10 +495,21 @@ export class BuilderPage {
 
   protected resetForm(): void {
     this.form.reset();
+    this.visibleProjectCount.set(0);
+  }
+
+  protected addProject(): void {
+    const nextProject = this.projectForms[this.visibleProjectCount()];
+    if (!nextProject) {
+      return;
+    }
+
+    this.form.controls[nextProject.key].reset(this.projectSample());
+    this.visibleProjectCount.update((count) => count + 1);
   }
 
   protected get structuredProjects(): StructuredProject[] {
-    return this.projectForms.map(({ key, number }) => {
+    return this.visibleProjectForms().map(({ key, number }) => {
       const project = this.form.controls[key].getRawValue();
       return {
         key,
@@ -630,17 +651,32 @@ export class BuilderPage {
   }
 
   private createProjectGroup(includeSample = false) {
+    const sample = includeSample ? this.projectSample() : undefined;
     return this.fb.group({
-      client: [includeSample ? 'Example Client' : ''],
-      name: [includeSample ? 'Sample Project' : ''],
-      type: [includeSample ? 'Web Application' : ''],
-      technologies: [includeSample ? 'Angular, TypeScript, REST APIs' : ''],
-      database: [includeSample ? 'PostgreSQL' : ''],
-      role: [includeSample ? 'Software Developer' : ''],
-      tools: [includeSample ? 'VS Code, Git, Postman' : ''],
-      responsibilities: [includeSample ? 'Built reusable user-interface components\nWorked with APIs and tested feature flows' : ''],
-      description: [includeSample ? 'A sample project entry showing how project details, responsibilities, and descriptions appear in the Traditional template.' : '']
+      client: [sample?.client ?? ''],
+      name: [sample?.name ?? ''],
+      type: [sample?.type ?? ''],
+      technologies: [sample?.technologies ?? ''],
+      database: [sample?.database ?? ''],
+      role: [sample?.role ?? ''],
+      tools: [sample?.tools ?? ''],
+      responsibilities: [sample?.responsibilities ?? ''],
+      description: [sample?.description ?? '']
     });
+  }
+
+  private projectSample() {
+    return {
+      client: 'Example Client',
+      name: 'Sample Project',
+      type: 'Web Application',
+      technologies: 'Angular, TypeScript, REST APIs',
+      database: 'PostgreSQL',
+      role: 'Software Developer',
+      tools: 'VS Code, Git, Postman',
+      responsibilities: 'Built reusable user-interface components\nWorked with APIs and tested feature flows',
+      description: 'A sample project entry showing how project details, responsibilities, and descriptions appear in the Traditional template.'
+    };
   }
 
   private structuredDocxChildren(fullName: string): Paragraph[] {
