@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
-
 :root { --bg:#f6f7fb; --surface:#fff; --surface-strong:#f1f5ff; --panel:#f1f5ff; --ink:#172033; --text:var(--ink); --muted:#697386; --primary:#5b4cf4; --primary-strong:#4234cf; --accent:#f5b84b; --primary-soft:rgba(91,76,244,.1); --border:#e4e7ef; --success:#0e8c7d; --shadow:0 20px 55px rgba(26,37,68,.1); }
 :root[data-theme='dark'] { --bg:#11131d; --surface:#191c29; --surface-strong:#202536; --panel:#202536; --ink:#f4f5f9; --text:var(--ink); --muted:#a9b0c0; --primary:#9c91ff; --primary-strong:#b9b1ff; --accent:#ffc95c; --primary-soft:rgba(156,145,255,.15); --border:#303647; --success:#69d5c7; --shadow:0 20px 55px rgba(0,0,0,.25); }
 * { box-sizing:border-box; } html { scroll-behavior:smooth; } body { margin:0; min-height:100vh; background:var(--bg); color:var(--text); font-family:'DM Sans','Segoe UI',sans-serif; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
@@ -9,3 +7,12 @@ input,textarea,select { width:100%; border:1px solid var(--border); border-radiu
 h1,h2,h3,h4,p { margin:0; } h1,h2 { color:var(--ink); font-family:'Playfair Display',Georgia,serif; } h1 { font-size:clamp(3rem,6vw,5.7rem); line-height:.97; letter-spacing:-.065em; } h2 { font-size:clamp(2.25rem,4vw,3.7rem); line-height:1.04; letter-spacing:-.055em; } h3 { font-size:1.08rem; } p { color:var(--muted); line-height:1.7; }
 .button { display:inline-flex; align-items:center; justify-content:center; border:1px solid transparent; border-radius:.7rem; padding:.9rem 1.2rem; background:var(--primary); color:#fff; font-weight:700; box-shadow:0 10px 20px rgba(91,76,244,.2); transition:transform .2s ease,box-shadow .2s ease,background .2s ease; }.button:hover { transform:translateY(-2px); background:var(--primary-strong); box-shadow:0 14px 28px rgba(91,76,244,.28); }.button-secondary { background:var(--surface); color:var(--text); border-color:var(--border); box-shadow:none; }.button-secondary:hover { background:var(--surface-strong); }.button-small { padding:.65rem .9rem; font-size:.86rem; }.badge { display:inline-flex; align-items:center; gap:.4rem; border:1px solid var(--border); border-radius:99px; background:var(--surface); color:var(--text); padding:.48rem .72rem; font-size:.78rem; font-weight:700; }
 @media(max-width:640px) { .shell { width:min(100% - 2rem,1240px); }.section { padding-block:4rem; } }
+
+/* Native browser printing keeps resume text as vector text in Save as PDF. */
+@media print {
+  @page { size:A4; margin:0; }
+  body { background:#fff !important; }
+  body * { visibility:hidden !important; }
+  .resume-preview, .resume-preview * { visibility:visible !important; }
+  .resume-preview { position:absolute !important; inset:0 auto auto 0 !important; width:210mm !important; min-height:297mm !important; margin:0 !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; }
+}

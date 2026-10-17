@@ -79,7 +79,14 @@ interface EditableTableRow { id: string; label: string; value: string; }
             <div class="reference-fields student-editor">
               <p class="customization-hint">Every field below is editable. Use one line for each bullet or resume entry.</p>
               <label><span>Education heading</span><input formControlName="studentEducationTitle" /></label>
-              <label><span>Education</span><textarea formControlName="studentEducation"></textarea></label>
+              <div class="education-editor">
+                <label>
+                  <span>Education</span>
+                  <small>Select any text and use the Bold button, or type <code>**text**</code> to make just that part bold. Press Enter for a new line; spaces and indentation are kept exactly as typed.</small>
+                  <textarea id="student-education-editor" formControlName="studentEducation" wrap="off"></textarea>
+                </label>
+                <button type="button" class="format-button" (click)="toggleEducationBold()"><strong>B</strong> Bold selected text</button>
+              </div>
               <label><span>Technical skills heading</span><input formControlName="studentSkillsTitle" /></label>
               <label><span>Technical skills (one skill per line)</span><textarea formControlName="studentSkills"></textarea></label>
               <label><span>Certifications heading</span><input formControlName="studentCertificationsTitle" /></label>
@@ -323,7 +330,8 @@ interface EditableTableRow { id: string; label: string; value: string; }
             <span class="preview-template">{{ selectedTemplate()?.name ?? 'Classic' }}</span>
           </div>
 
-          <div
+          <div class="preview-viewport">
+            <div
             #resumePreview
             class="resume-preview"
             [class.pdf-export]="isPdfExporting()"
@@ -335,7 +343,7 @@ interface EditableTableRow { id: string; label: string; value: string; }
                   <h2>{{ form.controls.fullName.value || 'Your Name' }}</h2>
                   <div>{{ form.controls.email.value }} &nbsp; | &nbsp; {{ form.controls.phone.value }} &nbsp; | &nbsp; {{ form.controls.website.value }} &nbsp; | &nbsp; {{ form.controls.location.value }}</div>
                 </header>
-                <section><h3>{{ form.controls.studentEducationTitle.value }}</h3><div class="student-education">@for (line of splitLines(form.controls.studentEducation.value); track $index) { <p>{{ line }}</p> }</div></section>
+                <section><h3>{{ form.controls.studentEducationTitle.value }}</h3><div class="student-education">@for (line of educationLines(form.controls.studentEducation.value); track $index) { <p [class.empty-line]="!line.trim()">@for (part of educationParts(line); track $index) { @if (part.bold) { <strong>{{ part.text }}</strong> } @else { <span>{{ part.text }}</span> } }</p> }</div></section>
                 <section><h3>{{ form.controls.studentSkillsTitle.value }}</h3><ul>@for (line of splitLines(form.controls.studentSkills.value); track $index) { <li>{{ line }}</li> }</ul></section>
                 <section><h3>{{ form.controls.studentCertificationsTitle.value }}</h3><ul>@for (line of splitLines(form.controls.studentCertifications.value); track $index) { <li>{{ line }}</li> }</ul></section>
                 <section><h3>{{ form.controls.studentProjectsTitle.value }}</h3><ul>@for (line of splitLines(form.controls.studentProjects.value); track $index) { <li>{{ line }}</li> }</ul></section>
@@ -533,10 +541,11 @@ interface EditableTableRow { id: string; label: string; value: string; }
                 </section>
               </div>
             }
+            </div>
           </div>
           <div class="actions-row preview-actions">
             <button type="button" class="button button-secondary" (click)="resetForm()">Reset</button>
-            <button type="button" class="button" (click)="downloadPdf()">Download PDF</button>
+            <button type="button" class="button" (click)="printResume()">Save high-quality PDF</button>
             <button type="button" class="button" (click)="downloadDocx()">Download DOCX</button>
           </div>
         </div>
@@ -595,7 +604,7 @@ export class BuilderPage {
     projects: ['Resume Maker · Built a responsive resume generator with live preview and export features.\nPortfolio Redesign · Reworked design system for 3 product lines and launched an improved mobile experience.'],
     skills: ['UX strategy, Figma, Design systems, Prototyping, Research synthesis, Product thinking'],
     studentEducationTitle: ['EDUCATION'],
-    studentEducation: ['Bachelor of Technology (B.Tech) in Computer Science\nIndian Institute of Technology (IIT), Delhi\nExpected Graduation: May 2027\nCGPA: 8.7/10  |  Relevant Coursework: Data Structures, Algorithms, Databases, Machine Learning, Web Development\n\nSenior Secondary (Class XII)\nDelhi Public School, RK Puram\nPercentage: 92% (CBSE Board)\n\nMatriculation (Class X)\nSt. Xavier\'s School, New Delhi\nScore: 95%'],
+    studentEducation: ['**Bachelor of Technology (B.Tech) in Computer Science**\n  Indian Institute of Technology (IIT), Delhi\n  Expected Graduation: May 2027\n  CGPA: 8.7/10  |  Relevant Coursework: Data Structures, Algorithms, Databases, Machine\n  Learning, Web Development\n\n**Senior Secondary (Class XII)**\n  Delhi Public School, RK Puram\n  Percentage: 92% (CBSE Board)\n\n**Matriculation (Class X)**\n  St. Xavier\'s School, New Delhi\n  Score: 95%'],
     studentSkillsTitle: ['TECHNICAL SKILLS'],
     studentSkills: ['Programming Languages: Java, Python, C++\nWeb Development: Angular, Spring Boot, HTML, CSS, JavaScript\nDatabases: PostgreSQL, MySQL\nTools & Platforms: Git, Docker, Google Cloud Platform'],
     studentCertificationsTitle: ['CERTIFICATIONS'],
@@ -787,6 +796,38 @@ export class BuilderPage {
       .filter(Boolean);
   }
 
+  protected educationParts(line: string): { text: string; bold: boolean }[] {
+    return line.split(/(\*\*.+?\*\*)/g).filter(Boolean).map((part) => {
+      const bold = part.startsWith('**') && part.endsWith('**');
+      return { text: bold ? part.slice(2, -2) : part, bold };
+    });
+  }
+
+  protected educationLines(value: string | null | undefined): string[] {
+    return (value ?? '').replace(/\r\n/g, '\n').split('\n');
+  }
+
+  protected toggleEducationBold(): void {
+    if (typeof document === 'undefined') {
+      return;
+    }
+    const editor = document.getElementById('student-education-editor') as HTMLTextAreaElement | null;
+    if (!editor) {
+      return;
+    }
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    const value = editor.value;
+    const selected = value.slice(start, end);
+    const updated = `${value.slice(0, start)}**${selected}**${value.slice(end)}`;
+    this.form.controls.studentEducation.setValue(updated);
+    requestAnimationFrame(() => {
+      editor.focus();
+      const caret = selected ? end + 4 : start + 2;
+      editor.setSelectionRange(caret, caret);
+    });
+  }
+
   protected async downloadPdf(): Promise<void> {
     if (typeof window === 'undefined') {
       return;
@@ -805,11 +846,11 @@ export class BuilderPage {
       margin: this.isStructuredTemplate() ? 0 : 2,
       filename: `${(this.form.get('fullName')?.value || 'resume').trim() || 'resume'}.pdf`,
       // html2pdf paints the resume into a canvas before writing the PDF.
-      // Three-times resolution keeps the small text sharp without the canvas
-      // limits that can affect PNG exports.
-      image: { type: 'jpeg' as const, quality: 1 },
+      // Use a lossless image and a higher capture scale: resumes contain small
+      // text, for which JPEG artifacts are especially noticeable in print.
+      image: { type: 'png' as const },
       html2canvas: {
-        scale: 3,
+        scale: 4,
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
@@ -869,6 +910,12 @@ export class BuilderPage {
       await html2pdf().set(options).from(element.nativeElement).save();
     } finally {
       this.isPdfExporting.set(false);
+    }
+  }
+
+  protected printResume(): void {
+    if (typeof window !== 'undefined') {
+      window.print();
     }
   }
 
