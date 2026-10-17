@@ -3,4 +3,4 @@ command = "npm run build"
 publish = "dist/resume-maker/browser"
 
 [build.environment]
-NODE_VERSION = "22.12.0"
+NODE_VERSION = "22.22.0"
