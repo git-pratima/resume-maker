@@ -79,6 +79,8 @@ interface EditableTableRow { id: string; label: string; value: string; }
           @if (isStudentTemplate()) {
             <div class="reference-fields student-editor">
               <p class="customization-hint">Every field below is editable. Use one line for each bullet or resume entry.</p>
+              <label><span>Career objective heading</span><input formControlName="studentCareerObjectiveTitle" /></label>
+              <label><span>Career objective</span><textarea formControlName="studentCareerObjective"></textarea></label>
               <label><span>Education heading</span><input formControlName="studentEducationTitle" /></label>
               <div class="education-editor">
                 <label>
@@ -344,6 +346,7 @@ interface EditableTableRow { id: string; label: string; value: string; }
                   <h2>{{ form.controls.fullName.value || 'Your Name' }}</h2>
                   <div>{{ form.controls.email.value }} &nbsp; | &nbsp; {{ form.controls.phone.value }} &nbsp; | &nbsp; {{ form.controls.website.value }} &nbsp; | &nbsp; {{ form.controls.location.value }}</div>
                 </header>
+                <section><h3>{{ form.controls.studentCareerObjectiveTitle.value }}</h3><p>{{ form.controls.studentCareerObjective.value }}</p></section>
                 <section><h3>{{ form.controls.studentEducationTitle.value }}</h3><div class="student-education">@for (line of educationLines(form.controls.studentEducation.value); track $index) { <p [class.empty-line]="!line.trim()">@for (part of educationParts(line); track $index) { @if (part.bold) { <strong>{{ part.text }}</strong> } @else { <span>{{ part.text }}</span> } }</p> }</div></section>
                 <section><h3>{{ form.controls.studentSkillsTitle.value }}</h3><ul>@for (line of splitLines(form.controls.studentSkills.value); track $index) { <li>{{ line }}</li> }</ul></section>
                 <section><h3>{{ form.controls.studentCertificationsTitle.value }}</h3><ul>@for (line of splitLines(form.controls.studentCertifications.value); track $index) { <li>{{ line }}</li> }</ul></section>
@@ -604,6 +607,8 @@ export class BuilderPage {
     education: ['B.A. in Interaction Design · University of Washington · 2018'],
     projects: ['MakeMyResume · Built a responsive resume generator with live preview and export features.\nPortfolio Redesign · Reworked design system for 3 product lines and launched an improved mobile experience.'],
     skills: ['UX strategy, Figma, Design systems, Prototyping, Research synthesis, Product thinking'],
+    studentCareerObjectiveTitle: ['CAREER OBJECTIVE'],
+    studentCareerObjective: ['Motivated computer science student seeking an opportunity to apply programming, problem-solving, and teamwork skills while contributing to meaningful software projects.'],
     studentEducationTitle: ['EDUCATION'],
     studentEducation: ['**Bachelor of Technology (B.Tech) in Computer Science**\n  Indian Institute of Technology (IIT), Delhi\n  Expected Graduation: May 2027\n  CGPA: 8.7/10  |  Relevant Coursework: Data Structures, Algorithms, Databases, Machine\n  Learning, Web Development\n\n**Senior Secondary (Class XII)**\n  Delhi Public School, RK Puram\n  Percentage: 92% (CBSE Board)\n\n**Matriculation (Class X)**\n  St. Xavier\'s School, New Delhi\n  Score: 95%'],
     studentSkillsTitle: ['TECHNICAL SKILLS'],
@@ -937,8 +942,18 @@ export class BuilderPage {
           new Paragraph({ text: `${this.form.get('email')?.value || ''} | ${this.form.get('phone')?.value || ''}` }),
           new Paragraph({ text: `${this.form.get('location')?.value || ''} | ${this.form.get('website')?.value || ''}` }),
           new Paragraph({ text: '' }),
-          new Paragraph({ text: 'Summary', heading: HeadingLevel.HEADING_2 }),
-          new Paragraph({ text: this.form.get('summary')?.value || '' }),
+          ...(this.isStudentTemplate()
+            ? [
+                new Paragraph({
+                  text: this.form.controls.studentCareerObjectiveTitle.value ?? 'Career Objective',
+                  heading: HeadingLevel.HEADING_2
+                }),
+                new Paragraph({ text: this.form.controls.studentCareerObjective.value ?? '' })
+              ]
+            : [
+                new Paragraph({ text: 'Summary', heading: HeadingLevel.HEADING_2 }),
+                new Paragraph({ text: this.form.get('summary')?.value || '' })
+              ]),
           new Paragraph({ text: '' }),
           new Paragraph({ text: 'Experience', heading: HeadingLevel.HEADING_2 }),
           ...this.splitLines(this.form.get('experience')?.value).map((line) => new Paragraph({ text: line })),
