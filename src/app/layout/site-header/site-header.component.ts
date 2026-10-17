@@ -9,8 +9,7 @@ import { ThemeService } from '../../core/theme.service';
     <header class="site-header">
       <div class="shell header-content">
         <a class="brand" routerLink="/" aria-label="MakeMyResume home">
-          <img class="brand-logo" src="/logo.png" alt="" width="48" height="48">
-          <span>MakeMyResume</span>
+          <img class="brand-logo" src="/logo.png" alt="" width="72" height="72">
         </a>
 
         <nav aria-label="Main navigation">

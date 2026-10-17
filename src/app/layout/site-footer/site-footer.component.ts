@@ -8,9 +8,7 @@ import { RouterLink } from '@angular/router';
     <footer>
       <div class="shell footer-content">
         <p>
-          <img class="footer-logo" src="/logo.png" alt="" width="40" height="40">
-          <strong>MakeMyResume</strong>
-          <span>Build your resume. Showcase your potential.</span>
+          <img class="footer-logo" src="/logo.png" alt="MakeMyResume — We Build Your Career" width="64" height="64">
         </p>
         <nav aria-label="Footer navigation">
           <a routerLink="/templates">Templates</a>
