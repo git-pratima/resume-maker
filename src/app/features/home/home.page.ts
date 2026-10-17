@@ -201,7 +201,9 @@ export class HomePage {
     inject(SeoService).setPage({
       title: 'Free ATS-Friendly Resume Builder | MakeMyResume',
       description:
-        'Make a job-ready resume with MakeMyResume, a free online ATS-friendly resume builder. Customize professional resume templates and download your resume as PDF or Word.'
+        'Make a job-ready resume with MakeMyResume, a free online ATS-friendly resume builder. Customize professional resume templates and download your resume as PDF or Word.',
+      keywords:
+        'MakeMyResume, free resume builder, online resume maker, resume creator, ATS-friendly resume, professional resume, resume PDF, Word resume, CV maker'
     });
   }
 }

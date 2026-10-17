@@ -57,23 +57,26 @@ import { ResumeTemplate, TemplateService } from '../../core/template.service';
           @for (template of filteredTemplates(); track template.id) {
             <article class="template-card" [class.is-selected]="templates.selected()?.id === template.id">
               <div class="template-preview" [style.--accent]="template.accent" aria-hidden="true">
-                <div class="template-preview-sheet" [class.two-column]="template.layout === 'Two-column'">
+                <div
+                  class="template-preview-sheet"
+                  [class.two-column]="template.layout === 'Two-column'"
+                  [attr.data-template]="template.id">
                   <header class="sample-header">
                     <strong>{{ template.sample.name }}</strong>
                     <span>{{ template.sample.contact }}</span>
                     <small>{{ template.sample.title }}</small>
                   </header>
                   <div class="sample-summary">
-                    <b>PROFILE</b>
+                    <b>{{ template.id === 'structured-professional' || template.id === 'traditional-c' ? 'OBJECTIVE' : 'PROFILE' }}</b>
                     <p>{{ template.sample.summary }}</p>
                   </div>
                   <div class="sample-details">
                     <div>
-                      <b>EXPERIENCE</b>
+                      <b>{{ template.id === 'student' ? 'EDUCATION' : template.id === 'structured-professional' || template.id === 'traditional-c' ? 'TECHNICAL SKILLS' : 'EXPERIENCE' }}</b>
                       <p>{{ template.sample.experience }}</p>
                     </div>
                     <div>
-                      <b>SKILLS</b>
+                      <b>{{ template.id === 'structured-professional' || template.id === 'traditional-c' ? 'WORK EXPERIENCE' : 'SKILLS' }}</b>
                       <p>{{ template.sample.skills }}</p>
                     </div>
                   </div>
@@ -123,7 +126,9 @@ export class TemplatesPage {
     inject(SeoService).setPage({
       title: 'Free ATS-Friendly Resume Templates | MakeMyResume',
       description:
-        'Browse free, professional ATS-friendly resume templates for students and experienced professionals. Choose a layout and customize your resume with MakeMyResume.'
+        'Browse free, professional ATS-friendly resume templates for students and experienced professionals. Choose a layout and customize your resume with MakeMyResume.',
+      keywords:
+        'MakeMyResume templates, free resume templates, ATS-friendly resume templates, professional resume template, student resume template, executive resume template, CV templates'
     });
   }
 

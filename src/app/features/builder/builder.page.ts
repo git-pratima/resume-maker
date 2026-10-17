@@ -649,6 +649,8 @@ export class BuilderPage {
       title: 'Free Online Resume Builder | MakeMyResume',
       description:
         'Create and customize a resume with MakeMyResume, then download it as a PDF or Word document.',
+      keywords:
+        'MakeMyResume resume builder, online resume builder, free resume maker, create a resume, resume PDF download, Word resume builder',
       robots: 'noindex, follow'
     });
 
