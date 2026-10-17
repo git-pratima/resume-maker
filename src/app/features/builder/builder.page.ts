@@ -2,6 +2,7 @@
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { SeoService } from '../../core/seo.service';
 import { Document as DocxDocument, HeadingLevel, Packer, Paragraph, TextRun } from 'docx';
 import { TemplateService } from '../../core/template.service';
 
@@ -601,7 +602,7 @@ export class BuilderPage {
     summary: ['Product designer with 6+ years of experience creating inclusive user journeys for SaaS products and mobile experiences.'],
     experience: ['Senior Product Designer · Northstar Labs · 2022–Present\nDesigned onboarding and dashboard flows that improved activation by 24%.\nLed A/B testing across three key conversion journeys.'],
     education: ['B.A. in Interaction Design · University of Washington · 2018'],
-    projects: ['Resume Maker · Built a responsive resume generator with live preview and export features.\nPortfolio Redesign · Reworked design system for 3 product lines and launched an improved mobile experience.'],
+    projects: ['MakeMyResume · Built a responsive resume generator with live preview and export features.\nPortfolio Redesign · Reworked design system for 3 product lines and launched an improved mobile experience.'],
     skills: ['UX strategy, Figma, Design systems, Prototyping, Research synthesis, Product thinking'],
     studentEducationTitle: ['EDUCATION'],
     studentEducation: ['**Bachelor of Technology (B.Tech) in Computer Science**\n  Indian Institute of Technology (IIT), Delhi\n  Expected Graduation: May 2027\n  CGPA: 8.7/10  |  Relevant Coursework: Data Structures, Algorithms, Databases, Machine\n  Learning, Web Development\n\n**Senior Secondary (Class XII)**\n  Delhi Public School, RK Puram\n  Percentage: 92% (CBSE Board)\n\n**Matriculation (Class X)**\n  St. Xavier\'s School, New Delhi\n  Score: 95%'],
@@ -610,7 +611,7 @@ export class BuilderPage {
     studentCertificationsTitle: ['CERTIFICATIONS'],
     studentCertifications: ['Certified in Machine Learning by Coursera\nWeb Development Certificate from Udemy'],
     studentProjectsTitle: ['PROJECTS'],
-    studentProjects: ['Resume Maker Web Application · Built using Angular and Spring Boot. Generated resumes in PDF/Word formats.\nSmart Attendance System · Developed a face-recognition based attendance tracker using Python and OpenCV.'],
+    studentProjects: ['MakeMyResume Web Application · Built using Angular and Spring Boot. Generated resumes in PDF/Word formats.\nSmart Attendance System · Developed a face-recognition based attendance tracker using Python and OpenCV.'],
     studentInternshipTitle: ['INTERNSHIP'],
     studentInternship: ['Software Development Intern · Infosys, Bengaluru\nJune 2026 – August 2026\nWorked on backend APIs using Spring Boot.\nImproved query performance by 25%.'],
     studentActivitiesTitle: ['EXTRACURRICULAR ACTIVITIES'],
@@ -644,6 +645,13 @@ export class BuilderPage {
   protected readonly isPdfExporting = signal(false);
 
   constructor() {
+    inject(SeoService).setPage({
+      title: 'Free Online Resume Builder | MakeMyResume',
+      description:
+        'Create and customize a resume with MakeMyResume, then download it as a PDF or Word document.',
+      robots: 'noindex, follow'
+    });
+
     this.route.queryParamMap.subscribe((params) => {
       const templateId = params.get('template');
       if (templateId) {

@@ -7,7 +7,11 @@ import { RouterLink } from '@angular/router';
   template: `
     <footer>
       <div class="shell footer-content">
-        <p><strong>Resume Maker</strong> <span>Build your resume. Showcase your potential.</span></p>
+        <p>
+          <img class="footer-logo" src="/logo.png" alt="" width="40" height="40">
+          <strong>MakeMyResume</strong>
+          <span>Build your resume. Showcase your potential.</span>
+        </p>
         <nav aria-label="Footer navigation">
           <a routerLink="/templates">Templates</a>
           <a routerLink="/builder">Builder</a>

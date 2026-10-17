@@ -1,4 +1,4 @@
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-@Component({ standalone: true, template: `<section class="shell page"><p class="eyebrow">Resume Maker</p><h1>{{ title }}</h1><p>{{ description }}</p></section>` })
+@Component({ standalone: true, template: `<section class="shell page"><p class="eyebrow">MakeMyResume</p><h1>{{ title }}</h1><p>{{ description }}</p></section>` })
 export class ContentPage { private readonly route = inject(ActivatedRoute); protected readonly title = this.route.snapshot.data['page'] === 'privacy' ? 'Privacy policy' : this.route.snapshot.data['page'] === 'terms' ? 'Terms and conditions' : this.route.snapshot.data['page'] === 'faq' ? 'Frequently asked questions' : 'Resume writing tips'; protected readonly description = this.route.snapshot.data['page'] === 'privacy' ? 'Your resume information is processed in your browser and is not saved by this application.' : 'Practical, straightforward guidance is on its way in a later milestone.'; }

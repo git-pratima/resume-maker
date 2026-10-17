@@ -1,5 +1,6 @@
 ﻿import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { SeoService } from '../../core/seo.service';
 import { ResumeTemplate, TemplateService } from '../../core/template.service';
 
 @Component({
@@ -117,6 +118,14 @@ export class TemplatesPage {
 
   protected readonly categories = Array.from(new Set(this.templates.templates.map((template) => template.category)));
   protected readonly layouts = Array.from(new Set(this.templates.templates.map((template) => template.layout)));
+
+  constructor() {
+    inject(SeoService).setPage({
+      title: 'Free ATS-Friendly Resume Templates | MakeMyResume',
+      description:
+        'Browse free, professional ATS-friendly resume templates for students and experienced professionals. Choose a layout and customize your resume with MakeMyResume.'
+    });
+  }
 
   protected readonly filteredTemplates = computed(() => {
     const category = this.category();

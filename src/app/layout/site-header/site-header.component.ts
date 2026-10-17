@@ -8,9 +8,9 @@ import { ThemeService } from '../../core/theme.service';
   template: `
     <header class="site-header">
       <div class="shell header-content">
-        <a class="brand" routerLink="/" aria-label="Resume Maker home">
-          <span class="brand-mark" aria-hidden="true">R</span>
-          <span>Resume Maker</span>
+        <a class="brand" routerLink="/" aria-label="MakeMyResume home">
+          <img class="brand-logo" src="/logo.png" alt="" width="48" height="48">
+          <span>MakeMyResume</span>
         </a>
 
         <nav aria-label="Main navigation">

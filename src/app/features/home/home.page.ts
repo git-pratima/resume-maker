@@ -1,5 +1,6 @@
 ﻿import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { SeoService } from '../../core/seo.service';
 import { TemplateService } from '../../core/template.service';
 
 @Component({
@@ -10,16 +11,16 @@ import { TemplateService } from '../../core/template.service';
       <div class="shell hero-grid">
         <div class="hero-copy">
           <p class="eyebrow">Build your resume with confidence</p>
-          <h1>Create a Professional Resume in Minutes</h1>
+          <h1>Free ATS-Friendly Resume Builder</h1>
           <p class="lede">
-            Choose a template, enter your details, preview your resume, and download it as PDF or Word.
-            No account required.
+            Create a job-ready resume online with customizable professional templates. Preview your resume
+            and download it as a PDF or Word document for free, with no account required.
           </p>
           <div class="actions">
             <a class="button" routerLink="/builder">Create My Resume</a>
             <a class="button button-secondary" routerLink="/templates">Explore Templates</a>
           </div>
-          <div class="trust-row" aria-label="Resume Maker highlights">
+          <div class="trust-row" aria-label="MakeMyResume highlights">
             <span class="badge">ATS-friendly</span>
             <span class="badge">Browser-based</span>
             <span class="badge">Instant export</span>
@@ -195,4 +196,12 @@ import { TemplateService } from '../../core/template.service';
 export class HomePage {
   protected readonly templates = inject(TemplateService);
   protected readonly featuredTemplates = this.templates.templates.slice(0, 3);
+
+  constructor() {
+    inject(SeoService).setPage({
+      title: 'Free ATS-Friendly Resume Builder | MakeMyResume',
+      description:
+        'Make a job-ready resume with MakeMyResume, a free online ATS-friendly resume builder. Customize professional resume templates and download your resume as PDF or Word.'
+    });
+  }
 }
