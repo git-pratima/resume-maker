@@ -339,7 +339,7 @@
   box-sizing: border-box;
   min-height: 297mm;
   margin-top: 0;
-  padding-top: 18mm;
+  padding-top: 0;
 }
 .resume-preview.pdf-export[data-template='structured-professional'] .structured-project-page-start > .structured-footer {
   margin-top: auto;
@@ -350,8 +350,10 @@
 .pdf-page-start-rule { display: none; }
 .resume-preview.pdf-export[data-template='structured-professional'] .pdf-page-start-rule {
   display: block;
-  margin: 0 0 2mm;
-  border-top: 1px solid #dfe7f2;
+  flex: 0 0 18mm;
+  height: 18mm;
+  margin: 0;
+  border: 0;
 }
 .resume-preview[data-template='structured-professional'] .structured-project > .traditional-section-title { margin-bottom: 0.05rem; }
 .resume-preview[data-template='structured-professional'] .structured-project dl { margin: 0; border: 1px solid #111; }
@@ -394,6 +396,25 @@
   margin-top: 0.5rem;
   color: #000;
   font-size: 8pt;
+}
+
+@media print {
+  .resume-preview[data-template='structured-professional'] {
+    width: 200mm !important;
+    min-height: 287mm !important;
+    margin: 5mm !important;
+    border: 0.25mm solid #94a3b8 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  .resume-preview[data-template='structured-professional'] .structured-project-page-start {
+    break-before: page !important;
+    page-break-before: always !important;
+    padding-top: 18mm !important;
+  }
 }
 
 /* Student reference layout */

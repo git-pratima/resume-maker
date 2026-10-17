@@ -18,9 +18,44 @@ interface StructuredProject {
   tools: string;
   responsibilities: string;
   description: string;
+  declaration: string;
 }
 
 interface EditableTableRow { id: string; label: string; value: string; }
+
+interface PdfPageFrame {
+  internal: { pageSize: { getWidth: () => number; getHeight: () => number } };
+  getNumberOfPages(): number;
+  setPage(page: number): void;
+  setDrawColor(red: number, green: number, blue: number): PdfPageFrame;
+  setLineWidth(width: number): PdfPageFrame;
+  rect(x: number, y: number, width: number, height: number): void;
+}
+
+function isPdfPageFrame(value: unknown): value is PdfPageFrame {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+
+  const pdf = value as Record<string, unknown>;
+  const internal = pdf['internal'];
+  if (typeof internal !== 'object' || internal === null) {
+    return false;
+  }
+
+  const pageSize = (internal as Record<string, unknown>)['pageSize'];
+  return (
+    typeof pdf['getNumberOfPages'] === 'function' &&
+    typeof pdf['setPage'] === 'function' &&
+    typeof pdf['setDrawColor'] === 'function' &&
+    typeof pdf['setLineWidth'] === 'function' &&
+    typeof pdf['rect'] === 'function' &&
+    typeof pageSize === 'object' &&
+    pageSize !== null &&
+    typeof (pageSize as Record<string, unknown>)['getWidth'] === 'function' &&
+    typeof (pageSize as Record<string, unknown>)['getHeight'] === 'function'
+  );
+}
 
 @Component({
   standalone: true,
@@ -265,6 +300,7 @@ interface EditableTableRow { id: string; label: string; value: string; }
                       <span>Tools</span>
                       <input formControlName="tools" />
                     </label>
+                    }
                     <label>
                       <span>Responsibilities (one point per line)</span>
                       <textarea formControlName="responsibilities"></textarea>
@@ -273,7 +309,10 @@ interface EditableTableRow { id: string; label: string; value: string; }
                       <span>Description</span>
                       <textarea formControlName="description"></textarea>
                     </label>
-                    }
+                    <label>
+                      <span>Declaration</span>
+                      <textarea formControlName="declaration"></textarea>
+                    </label>
                   </fieldset>
                 }
                 @if (visibleProjectForms().length < projectForms.length) {
@@ -465,6 +504,9 @@ interface EditableTableRow { id: string; label: string; value: string; }
                       }
                       @if (project.description) {
                         <p class="structured-project-copy"><strong>Description:</strong> {{ project.description }}</p>
+                      }
+                      @if (project.declaration) {
+                        <p class="structured-project-copy"><strong>Declaration:</strong> {{ project.declaration }}</p>
                       }
                       @if (projectIndex === structuredProjects.length - 1) {
                         <footer class="structured-footer">
@@ -751,7 +793,8 @@ export class BuilderPage {
         role: project.role ?? '',
         tools: project.tools ?? '',
         responsibilities: project.responsibilities ?? '',
-        description: project.description ?? ''
+        description: project.description ?? '',
+        declaration: project.declaration ?? ''
       };
     });
   }
@@ -881,12 +924,14 @@ export class BuilderPage {
             )
             .forEach((project) => {
               project.style.setProperty('margin-top', '0', 'important');
-              project.style.setProperty('padding-top', '18mm', 'important');
+              project.style.setProperty('padding-top', '0', 'important');
 
               const rule = project.querySelector<HTMLElement>('.pdf-page-start-rule');
               rule?.style.setProperty('display', 'block', 'important');
-              rule?.style.setProperty('border-top', '1px solid #dfe7f2', 'important');
-              rule?.style.setProperty('margin-bottom', '2mm', 'important');
+              rule?.style.setProperty('height', '18mm', 'important');
+              rule?.style.setProperty('flex', '0 0 18mm', 'important');
+              rule?.style.setProperty('border', '0', 'important');
+              rule?.style.setProperty('margin', '0', 'important');
             });
           document
             .querySelectorAll<HTMLElement>(
@@ -920,7 +965,24 @@ export class BuilderPage {
     };
 
     try {
-      await html2pdf().set(options).from(element.nativeElement).save();
+      const worker = html2pdf().set(options).from(element.nativeElement);
+      if (this.isStructuredTemplate()) {
+        await worker.toPdf().get('pdf', (value: unknown) => {
+          if (!isPdfPageFrame(value)) {
+            throw new Error('Unable to add page borders to the generated PDF.');
+          }
+          const pdf = value;
+          const pageWidth = pdf.internal.pageSize.getWidth();
+          const pageHeight = pdf.internal.pageSize.getHeight();
+          for (let page = 1; page <= pdf.getNumberOfPages(); page += 1) {
+            pdf.setPage(page);
+            pdf.setDrawColor(148, 163, 184);
+            pdf.setLineWidth(0.25);
+            pdf.rect(5, 5, pageWidth - 10, pageHeight - 10);
+          }
+        });
+      }
+      await worker.save();
     } finally {
       this.isPdfExporting.set(false);
     }
@@ -998,7 +1060,8 @@ export class BuilderPage {
       role: [sample?.role ?? ''],
       tools: [sample?.tools ?? ''],
       responsibilities: [sample?.responsibilities ?? ''],
-      description: [sample?.description ?? '']
+      description: [sample?.description ?? ''],
+      declaration: [sample?.declaration ?? '']
     });
   }
 
@@ -1012,7 +1075,8 @@ export class BuilderPage {
       role: 'Software Developer',
       tools: 'VS Code, Git, Postman',
       responsibilities: 'Built reusable user-interface components\nWorked with APIs and tested feature flows',
-      description: 'A sample project entry showing how project details, responsibilities, and descriptions appear in the Traditional template.'
+      description: 'A sample project entry showing how project details, responsibilities, and descriptions appear in the Traditional template.',
+      declaration: 'I declare that the project details and responsibilities listed above accurately represent my work.'
     };
   }
 
@@ -1064,7 +1128,8 @@ export class BuilderPage {
       addSection(`${this.sectionTitle('project', 'Project')} ${project.number}`, [
         ...this.displayedProjectRows(project).map(({ label, value }) => `${label}: ${value}`),
         ...this.splitLines(project.responsibilities).map((line) => `Responsibility: ${line}`),
-        project.description ? `Description: ${project.description}` : ''
+        project.description ? `Description: ${project.description}` : '',
+        project.declaration ? `Declaration: ${project.declaration}` : ''
       ]);
     }
     addSection('Additional Details', [
