@@ -126,9 +126,7 @@ export class TemplatesPage {
     inject(SeoService).setPage({
       title: 'Free ATS-Friendly Resume Templates | MakeMyResume',
       description:
-        'Browse free, professional ATS-friendly resume templates for students and experienced professionals. Choose a layout and customize your resume with MakeMyResume.',
-      keywords:
-        'MakeMyResume templates, free resume templates, ATS-friendly resume templates, professional resume template, student resume template, executive resume template, CV templates'
+        'Browse free, professional ATS-friendly resume templates for students and experienced professionals. Choose a layout and customize your resume with MakeMyResume.'
     });
   }
 
