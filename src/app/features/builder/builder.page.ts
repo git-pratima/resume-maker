@@ -23,6 +23,15 @@ interface StructuredProject {
 
 interface EditableTableRow { id: string; label: string; value: string; }
 
+type TraditionalCSection =
+  | 'objective'
+  | 'experienceSummary'
+  | 'technicalSkills'
+  | 'workExperience'
+  | 'professionalExperience'
+  | 'projects'
+  | 'additionalDetails';
+
 interface PdfPageFrame {
   internal: { pageSize: { getWidth: () => number; getHeight: () => number } };
   getNumberOfPages(): number;
@@ -148,6 +157,22 @@ function isPdfPageFrame(value: unknown): value is PdfPageFrame {
           } @else if (isStructuredTemplate()) {
             <div class="reference-fields">
               @if (isTraditionalC()) {
+                <fieldset class="traditional-c-options">
+                  <legend>Traditional-C options</legend>
+                  <p class="customization-hint">Choose which sections appear in your resume.</p>
+                  <div class="traditional-c-section-toggles">
+                    @for (section of traditionalCSections; track section.key) {
+                      <label>
+                        <input
+                          type="checkbox"
+                          [checked]="isTraditionalCSectionVisible(section.key)"
+                          (change)="setTraditionalCSectionVisible(section.key, $any($event.target).checked)"
+                        />
+                        <span>{{ section.label }}</span>
+                      </label>
+                    }
+                  </div>
+                </fieldset>
                 <label>
                   <span>Objective title</span>
                   <input [value]="sectionTitle('objective', 'Objective')" (input)="updateSectionTitle('objective', $any($event.target).value)" />
@@ -233,10 +258,38 @@ function isPdfPageFrame(value: unknown): value is PdfPageFrame {
               <div class="reference-field-group">
                 <h2>Professional experience and training</h2>
                 @if (isTraditionalC()) {
-                  <label>
-                    <span>Professional experience title</span>
-                    <input [value]="sectionTitle('professionalExperience', 'Professional Experience:')" (input)="updateSectionTitle('professionalExperience', $any($event.target).value)" />
-                  </label>
+                  <div class="professional-experience-title-layout">
+                    <label>
+                      <span>Professional experience title</span>
+                      <input [value]="sectionTitle('professionalExperience', 'Professional Experience:')" (input)="updateSectionTitle('professionalExperience', $any($event.target).value)" />
+                    </label>
+                    <fieldset class="professional-experience-layout" aria-label="Professional experience list layout">
+                      <label>
+                        <input
+                          type="radio"
+                          name="professionalExperienceLayout"
+                          value="vertical"
+                          aria-label="Vertical layout"
+                          title="Vertical"
+                          [checked]="professionalExperienceLayout() === 'vertical'"
+                          (change)="setProfessionalExperienceLayout('vertical')"
+                        />
+                        <span aria-hidden="true">V</span>
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          name="professionalExperienceLayout"
+                          value="horizontal"
+                          aria-label="Horizontal layout"
+                          title="Horizontal"
+                          [checked]="professionalExperienceLayout() === 'horizontal'"
+                          (change)="setProfessionalExperienceLayout('horizontal')"
+                        />
+                        <span aria-hidden="true">H</span>
+                      </label>
+                    </fieldset>
+                  </div>
                 }
                 <label>
                   <span>Training or experience details</span>
@@ -408,125 +461,144 @@ function isPdfPageFrame(value: unknown): value is PdfPageFrame {
                   </div>
                 </header>
 
-                <div class="traditional-box-group">
-                  <h3 class="traditional-section-title">{{ sectionTitle('objective', 'Objective') }}</h3>
-                  <section class="structured-box traditional-objective-value">
-                    <p>{{ form.controls.referenceObjective.value }}</p>
-                  </section>
-                </div>
+                @if (isTraditionalCSectionVisible('objective')) {
+                  <div class="traditional-box-group">
+                    <h3 class="traditional-section-title">{{ sectionTitle('objective', 'Objective') }}</h3>
+                    <section class="structured-box traditional-objective-value">
+                      <p>{{ form.controls.referenceObjective.value }}</p>
+                    </section>
+                  </div>
+                }
 
-                <div class="traditional-experience-group">
-                  <h3 class="traditional-section-title">{{ sectionTitle('experienceSummary', 'Experience Summary') }}</h3>
-                  <section class="structured-box traditional-experience">
-                    <div class="traditional-experience-content">
-                      @if (form.controls.referenceYears.value) {
-                        <p class="structured-years">{{ form.controls.referenceYears.value }}</p>
-                      }
-                      <ul>
-                        @for (entry of splitLines(form.controls.referenceExperienceSummary.value); track $index) {
-                          <li>{{ entry }}</li>
+                @if (isTraditionalCSectionVisible('experienceSummary')) {
+                  <div class="traditional-experience-group">
+                    <h3 class="traditional-section-title">{{ sectionTitle('experienceSummary', 'Experience Summary') }}</h3>
+                    <section class="structured-box traditional-experience">
+                      <div class="traditional-experience-content">
+                        @if (form.controls.referenceYears.value) {
+                          <p class="structured-years">{{ form.controls.referenceYears.value }}</p>
                         }
-                      </ul>
+                        <ul>
+                          @for (entry of splitLines(form.controls.referenceExperienceSummary.value); track $index) {
+                            <li>{{ entry }}</li>
+                          }
+                        </ul>
+                      </div>
+                    </section>
+                  </div>
+                }
+
+                @if (isTraditionalCSectionVisible('technicalSkills')) {
+                  <section class="structured-section traditional-section">
+                    <h3 class="traditional-section-title">{{ sectionTitle('technicalSkills', 'Technical Skills') }}</h3>
+                    <div class="structured-skill-grid">
+                      @for (skill of displayedTechnicalSkillRows(); track skill.id) {
+                        @if (skill.value) {
+                          <div class="structured-skill-row">
+                            <strong>{{ skill.label }}</strong>
+                            <span>{{ skill.value }}</span>
+                          </div>
+                        }
+                      }
                     </div>
                   </section>
-                </div>
+                }
 
-                <section class="structured-section traditional-section">
-                  <h3 class="traditional-section-title">{{ sectionTitle('technicalSkills', 'Technical Skills') }}</h3>
-                  <div class="structured-skill-grid">
-                    @for (skill of displayedTechnicalSkillRows(); track skill.id) {
-                      @if (skill.value) {
-                        <div class="structured-skill-row">
-                          <strong>{{ skill.label }}</strong>
-                          <span>{{ skill.value }}</span>
-                        </div>
-                      }
-                    }
-                  </div>
-                </section>
-
-                <section class="structured-section traditional-section">
-                  <h3 class="traditional-section-title">{{ sectionTitle('workExperience', 'Work Experience') }}</h3>
-                  <ul class="traditional-work-table">
-                    @for (entry of splitLines(form.controls.referenceWorkHistory.value); track $index) {
-                      <li>{{ entry }}</li>
-                    }
-                  </ul>
-                </section>
-
-                <section class="structured-section traditional-section">
-                  <h3 class="traditional-section-title">{{ sectionTitle('professionalExperience', 'Professional Experience:') }}</h3>
-                  @if (form.controls.referenceTraining.value) {
-                    <p>{{ form.controls.referenceTraining.value }}</p>
-                  }
-                  @if (form.controls.referenceTrainingTechnologies.value || form.controls.referenceTrainingTools.value) {
-                    <p><strong>Technology and tools used during training</strong></p>
-                    <ul class="traditional-professional-list">
-                      @for (entry of splitItems(form.controls.referenceTrainingTechnologies.value); track $index) {
-                        <li><span class="traditional-list-marker" aria-hidden="true">➢</span>{{ entry }}</li>
-                      }
-                      @for (entry of splitItems(form.controls.referenceTrainingTools.value); track $index) {
-                        <li><span class="traditional-list-marker" aria-hidden="true">➢</span>{{ entry }}</li>
+                @if (isTraditionalCSectionVisible('workExperience')) {
+                  <section class="structured-section traditional-section">
+                    <h3 class="traditional-section-title">{{ sectionTitle('workExperience', 'Work Experience') }}</h3>
+                    <ul class="traditional-work-table">
+                      @for (entry of splitLines(form.controls.referenceWorkHistory.value); track $index) {
+                        <li>{{ entry }}</li>
                       }
                     </ul>
-                  }
-                </section>
+                  </section>
+                }
 
-                @for (project of structuredProjects; track project.key; let projectIndex = $index) {
-                  @if (hasProjectContent(project)) {
-                    <section
-                      class="structured-project"
-                      [class.structured-project-page-start]="projectIndex > 0"
-                      [class.structured-project-page-end]="projectIndex < structuredProjects.length - 1">
-                      @if (projectIndex > 0) {
-                        <div class="pdf-page-start-rule" aria-hidden="true"></div>
-                      }
-                      <h3 class="traditional-section-title">{{ sectionTitle('project', 'Project') }} - {{ project.number }}</h3>
-                      <dl>
-                        @for (field of displayedProjectRows(project); track field.id) {
-                          @if (field.value) {
-                            <div>
-                              <dt>{{ field.label }}</dt>
-                              <dd>{{ field.value }}</dd>
-                            </div>
+                @if (isTraditionalCSectionVisible('professionalExperience')) {
+                  <section class="structured-section traditional-section">
+                    <h3 class="traditional-section-title">{{ sectionTitle('professionalExperience', 'Professional Experience:') }}</h3>
+                    @if (form.controls.referenceTraining.value) {
+                      <p>{{ form.controls.referenceTraining.value }}</p>
+                    }
+                    @if (form.controls.referenceTrainingTechnologies.value || form.controls.referenceTrainingTools.value) {
+                      <p><strong>Technology and tools used during training</strong></p>
+                      @if (isTraditionalC() && professionalExperienceLayout() === 'horizontal') {
+                        <p class="traditional-professional-horizontal">{{ professionalExperienceListText() }}</p>
+                      } @else {
+                        <ul class="traditional-professional-list">
+                          @for (entry of splitItems(form.controls.referenceTrainingTechnologies.value); track $index) {
+                            <li><span class="traditional-list-marker" aria-hidden="true">➢</span>{{ entry }}</li>
                           }
+                          @for (entry of splitItems(form.controls.referenceTrainingTools.value); track $index) {
+                            <li><span class="traditional-list-marker" aria-hidden="true">➢</span>{{ entry }}</li>
+                          }
+                        </ul>
+                      }
+                    }
+                  </section>
+                }
+
+                @if (isTraditionalCSectionVisible('projects')) {
+                  @for (project of structuredProjects; track project.key; let projectIndex = $index) {
+                    @if (hasProjectContent(project)) {
+                      <section
+                        class="structured-project"
+                        [class.structured-project-page-start]="projectIndex > 0"
+                        [class.structured-project-page-end]="projectIndex < structuredProjects.length - 1">
+                        @if (projectIndex > 0) {
+                          <div class="pdf-page-start-rule" aria-hidden="true"></div>
                         }
-                      </dl>
-                      @if (project.responsibilities) {
-                        <div class="structured-project-copy">
-                          <strong>Responsibilities:</strong>
-                          <ul>
-                            @for (entry of splitLines(project.responsibilities); track $index) {
-                              <li>{{ entry }}</li>
+                        <h3 class="traditional-section-title">{{ sectionTitle('project', 'Project') }} - {{ project.number }}</h3>
+                        <dl>
+                          @for (field of displayedProjectRows(project); track field.id) {
+                            @if (field.value) {
+                              <div>
+                                <dt>{{ field.label }}</dt>
+                                <dd>{{ field.value }}</dd>
+                              </div>
                             }
-                          </ul>
-                        </div>
-                      }
-                      @if (project.description) {
-                        <p class="structured-project-copy"><strong>Description:</strong> {{ project.description }}</p>
-                      }
-                      @if (project.declaration) {
-                        <p class="structured-project-copy"><strong>Declaration:</strong> {{ project.declaration }}</p>
-                      }
-                      @if (projectIndex === structuredProjects.length - 1) {
-                        <footer class="structured-footer">
-                          @if (form.controls.referenceGithub.value) {
-                            <p><strong>GitHub:</strong> {{ form.controls.referenceGithub.value }}</p>
                           }
-                          @if (form.controls.referenceDeclaration.value) {
-                            <p><strong>Declaration:</strong> {{ form.controls.referenceDeclaration.value }}</p>
-                          }
-                          <div class="structured-signoff">
-                            @if (form.controls.referencePlace.value) { <span>Place: {{ form.controls.referencePlace.value }}</span> }
-                            @if (form.controls.referenceSignature.value) { <span>Signature: {{ form.controls.referenceSignature.value }}</span> }
+                        </dl>
+                        @if (project.responsibilities) {
+                          <div class="structured-project-copy">
+                            <strong>Responsibilities:</strong>
+                            <ul>
+                              @for (entry of splitLines(project.responsibilities); track $index) {
+                                <li>{{ entry }}</li>
+                              }
+                            </ul>
                           </div>
-                        </footer>
-                      }
-                    </section>
+                        }
+                        @if (project.description) {
+                          <p class="structured-project-copy"><strong>Description:</strong> {{ project.description }}</p>
+                        }
+                        @if (project.declaration) {
+                          <p class="structured-project-copy"><strong>Declaration:</strong> {{ project.declaration }}</p>
+                        }
+                        @if (projectIndex === structuredProjects.length - 1 && isTraditionalCSectionVisible('additionalDetails')) {
+                          <footer class="structured-footer">
+                            @if (form.controls.referenceGithub.value) {
+                              <p><strong>GitHub:</strong> {{ form.controls.referenceGithub.value }}</p>
+                            }
+                            @if (form.controls.referenceDeclaration.value) {
+                              <p><strong>Declaration:</strong> {{ form.controls.referenceDeclaration.value }}</p>
+                            }
+                            <div class="structured-signoff">
+                              @if (form.controls.referencePlace.value) { <span>Place: {{ form.controls.referencePlace.value }}</span> }
+                              @if (form.controls.referenceSignature.value) { <span>Signature: {{ form.controls.referenceSignature.value }}</span> }
+                            </div>
+                          </footer>
+                        }
+                      </section>
+                    }
                   }
                 }
 
-                @if (structuredProjects.length === 0) {
+                @if (
+                  (structuredProjects.length === 0 || !isTraditionalCSectionVisible('projects')) &&
+                  isTraditionalCSectionVisible('additionalDetails')
+                ) {
                   <footer class="structured-footer">
                     @if (form.controls.referenceGithub.value) {
                       <p><strong>GitHub:</strong> {{ form.controls.referenceGithub.value }}</p>
@@ -620,6 +692,25 @@ export class BuilderPage {
     { label: 'Operating systems', control: 'referenceOperatingSystems' }
   ] as const;
   private readonly customSectionTitles = signal<Record<string, string>>({});
+  protected readonly traditionalCSections: { key: TraditionalCSection; label: string }[] = [
+    { key: 'objective', label: 'Objective' },
+    { key: 'experienceSummary', label: 'Experience Summary' },
+    { key: 'technicalSkills', label: 'Technical Skills' },
+    { key: 'workExperience', label: 'Work Experience' },
+    { key: 'professionalExperience', label: 'Professional Experience' },
+    { key: 'projects', label: 'Projects' },
+    { key: 'additionalDetails', label: 'Additional Details' }
+  ];
+  private readonly traditionalCSectionVisibility = signal<Record<TraditionalCSection, boolean>>({
+    objective: true,
+    experienceSummary: true,
+    technicalSkills: true,
+    workExperience: true,
+    professionalExperience: true,
+    projects: true,
+    additionalDetails: true
+  });
+  protected readonly professionalExperienceLayout = signal<'vertical' | 'horizontal'>('vertical');
   protected readonly technicalSkillRows = signal<EditableTableRow[]>([
     { id: 'technologies', label: 'Languages and technologies', value: 'JavaScript, TypeScript, Angular, Node.js, REST APIs' },
     { id: 'tools', label: 'Tools', value: 'Git, VS Code, Postman, Jira' },
@@ -719,6 +810,27 @@ export class BuilderPage {
     this.customSectionTitles.update((titles) => ({ ...titles, [key]: value }));
   }
 
+  protected isTraditionalCSectionVisible(section: TraditionalCSection): boolean {
+    return !this.isTraditionalC() || this.traditionalCSectionVisibility()[section];
+  }
+
+  protected setTraditionalCSectionVisible(section: TraditionalCSection, visible: boolean): void {
+    this.traditionalCSectionVisibility.update((sections) => ({ ...sections, [section]: visible }));
+  }
+
+  protected setProfessionalExperienceLayout(layout: 'vertical' | 'horizontal'): void {
+    this.professionalExperienceLayout.set(layout);
+  }
+
+  protected professionalExperienceListText(): string {
+    return [
+      this.form.controls.referenceTrainingTechnologies.value,
+      this.form.controls.referenceTrainingTools.value
+    ]
+      .filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
+      .join(', ');
+  }
+
   protected displayedTechnicalSkillRows(): EditableTableRow[] {
     if (this.isTraditionalC()) {
       return this.technicalSkillRows();
@@ -767,6 +879,16 @@ export class BuilderPage {
   protected resetForm(): void {
     this.form.reset();
     this.visibleProjectCount.set(0);
+    this.traditionalCSectionVisibility.set({
+      objective: true,
+      experienceSummary: true,
+      technicalSkills: true,
+      workExperience: true,
+      professionalExperience: true,
+      projects: true,
+      additionalDetails: true
+    });
+    this.professionalExperienceLayout.set('vertical');
   }
 
   protected addProject(): void {
@@ -1108,36 +1230,59 @@ export class BuilderPage {
       );
     };
 
-    addSection(this.sectionTitle('objective', 'Objective'), [this.form.controls.referenceObjective.value ?? '']);
-    addSection(this.sectionTitle('experienceSummary', 'Experience Summary'), [
-      this.form.controls.referenceYears.value ?? '',
-      ...this.splitLines(this.form.controls.referenceExperienceSummary.value)
-    ]);
-    addSection(this.sectionTitle('technicalSkills', 'Technical Skills'), this.displayedTechnicalSkillRows().map(({ label, value }) => `${label}: ${value}`));
-    addSection(this.sectionTitle('workExperience', 'Work Experience'), this.splitLines(this.form.controls.referenceWorkHistory.value));
-    addSection(this.sectionTitle('professionalExperience', 'Professional Experience:'), [
-      this.form.controls.referenceTraining.value ?? '',
-      `Technologies: ${this.form.controls.referenceTrainingTechnologies.value ?? ''}`,
-      `Tools: ${this.form.controls.referenceTrainingTools.value ?? ''}`
-    ]);
-
-    for (const project of this.structuredProjects) {
-      if (!this.hasProjectContent(project)) {
-        continue;
-      }
-      addSection(`${this.sectionTitle('project', 'Project')} ${project.number}`, [
-        ...this.displayedProjectRows(project).map(({ label, value }) => `${label}: ${value}`),
-        ...this.splitLines(project.responsibilities).map((line) => `Responsibility: ${line}`),
-        project.description ? `Description: ${project.description}` : '',
-        project.declaration ? `Declaration: ${project.declaration}` : ''
+    if (this.isTraditionalCSectionVisible('objective')) {
+      addSection(this.sectionTitle('objective', 'Objective'), [this.form.controls.referenceObjective.value ?? '']);
+    }
+    if (this.isTraditionalCSectionVisible('experienceSummary')) {
+      addSection(this.sectionTitle('experienceSummary', 'Experience Summary'), [
+        this.form.controls.referenceYears.value ?? '',
+        ...this.splitLines(this.form.controls.referenceExperienceSummary.value)
       ]);
     }
-    addSection('Additional Details', [
-      this.form.controls.referenceGithub.value ? `GitHub: ${this.form.controls.referenceGithub.value}` : '',
-      this.form.controls.referenceDeclaration.value ? `Declaration: ${this.form.controls.referenceDeclaration.value}` : '',
-      this.form.controls.referencePlace.value ? `Place: ${this.form.controls.referencePlace.value}` : '',
-      this.form.controls.referenceSignature.value ? `Signature: ${this.form.controls.referenceSignature.value}` : ''
-    ]);
+    if (this.isTraditionalCSectionVisible('technicalSkills')) {
+      addSection(this.sectionTitle('technicalSkills', 'Technical Skills'), this.displayedTechnicalSkillRows().map(({ label, value }) => `${label}: ${value}`));
+    }
+    if (this.isTraditionalCSectionVisible('workExperience')) {
+      addSection(this.sectionTitle('workExperience', 'Work Experience'), this.splitLines(this.form.controls.referenceWorkHistory.value));
+    }
+    if (this.isTraditionalCSectionVisible('professionalExperience')) {
+      const trainingItems = [
+        ...this.splitItems(this.form.controls.referenceTrainingTechnologies.value),
+        ...this.splitItems(this.form.controls.referenceTrainingTools.value)
+      ];
+      const professionalDetails = this.professionalExperienceLayout() === 'horizontal'
+        ? [`Technologies and tools: ${trainingItems.join(' · ')}`]
+        : [
+            `Technologies: ${this.form.controls.referenceTrainingTechnologies.value ?? ''}`,
+            `Tools: ${this.form.controls.referenceTrainingTools.value ?? ''}`
+          ];
+      addSection(this.sectionTitle('professionalExperience', 'Professional Experience:'), [
+        this.form.controls.referenceTraining.value ?? '',
+        ...professionalDetails
+      ]);
+    }
+
+    if (this.isTraditionalCSectionVisible('projects')) {
+      for (const project of this.structuredProjects) {
+        if (!this.hasProjectContent(project)) {
+          continue;
+        }
+        addSection(`${this.sectionTitle('project', 'Project')} ${project.number}`, [
+          ...this.displayedProjectRows(project).map(({ label, value }) => `${label}: ${value}`),
+          ...this.splitLines(project.responsibilities).map((line) => `Responsibility: ${line}`),
+          project.description ? `Description: ${project.description}` : '',
+          project.declaration ? `Declaration: ${project.declaration}` : ''
+        ]);
+      }
+    }
+    if (this.isTraditionalCSectionVisible('additionalDetails')) {
+      addSection('Additional Details', [
+        this.form.controls.referenceGithub.value ? `GitHub: ${this.form.controls.referenceGithub.value}` : '',
+        this.form.controls.referenceDeclaration.value ? `Declaration: ${this.form.controls.referenceDeclaration.value}` : '',
+        this.form.controls.referencePlace.value ? `Place: ${this.form.controls.referencePlace.value}` : '',
+        this.form.controls.referenceSignature.value ? `Signature: ${this.form.controls.referenceSignature.value}` : ''
+      ]);
+    }
     return paragraphs;
   }
 }

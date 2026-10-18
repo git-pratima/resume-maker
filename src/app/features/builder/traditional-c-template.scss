@@ -17,6 +17,60 @@
   font-size: 0.78rem;
 }
 
+.traditional-c-options {
+  display: grid;
+  gap: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.9rem;
+}
+
+.traditional-c-options > legend,
+.professional-experience-layout > legend {
+  padding: 0 0.35rem;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.traditional-c-section-toggles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem 0.9rem;
+}
+
+.resume-form .traditional-c-section-toggles label,
+.resume-form .professional-experience-layout label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.traditional-c-section-toggles input,
+.professional-experience-layout input {
+  margin: 0;
+}
+
+.professional-experience-title-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: end;
+}
+
+.professional-experience-layout {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.45rem;
+  margin: 0;
+  border: 0;
+  padding: 0 0 0.55rem;
+}
+
+.professional-experience-layout label {
+  gap: 0.25rem;
+}
+
 .editable-table-row {
   display: grid;
   grid-template-columns: minmax(9rem, 0.7fr) minmax(12rem, 1.3fr) auto;
@@ -24,6 +78,12 @@
   align-items: center;
 }
 
+.resume-preview.traditional-c-template .traditional-professional-horizontal {
+  white-space: pre-wrap;
+}
+
 @media (max-width: 640px) {
+  .traditional-c-section-toggles { grid-template-columns: 1fr; }
+  .professional-experience-title-layout { grid-template-columns: minmax(0, 1fr) auto; }
   .editable-table-row { grid-template-columns: 1fr; }
 }
